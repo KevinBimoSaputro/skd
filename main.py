@@ -13,50 +13,139 @@ st.set_page_config(
 
 
 def inject_global_css():
-    """Perbaikan CSS agar teks di sidebar terlihat jelas dan kontras."""
+    """Mengubah tema menjadi serba putih dengan aksen border hitam yang kontras."""
     st.markdown(
         """
         <style>
-        /* 1. Background Sidebar tetap gelap */
-        [data-testid="stSidebar"] {
-            background-color: #111827 !important;
+        /* 1. Background Utama & Sidebar jadi Putih */
+        .stApp, [data-testid="stSidebar"] {
+            background-color: #ffffff !important;
         }
 
-        /* 2. MEMPERBAIKI TEKS SIDEBAR (Sangat Penting) */
-        /* Menargetkan semua label, paragraf, dan teks radio button di sidebar */
+        /* 2. Tambahkan Border Hitam pada Sidebar sebagai pemisah */
+        [data-testid="stSidebar"] {
+            border-right: 2px solid #000000 !important;
+        }
+
+        /* 3. Semua Teks di Sidebar & Utama jadi Hitam Pekat */
         [data-testid="stSidebar"] .stMarkdown p,
         [data-testid="stSidebar"] label,
-        [data-testid="stSidebar"] .stRadio div[role="radiogroup"] p,
-        [data-testid="stSidebar"] div[data-testid="stWidgetLabel"] p {
-            color: #ffffff !important;
-            font-size: 1rem !important;
-            opacity: 1 !important;
+        [data-testid="stSidebar"] span,
+        [data-testid="stSidebar"] h1, h2, h3, p, label {
+            color: #000000 !important;
+            font-weight: 500;
         }
 
-        /* Khusus teks di samping bulatan Radio Button */
-        [data-testid="stSidebar"] div[data-baseweb="radio"] div {
-            color: #ffffff !important;
-        }
-
-        /* Judul Sidebar (Sidebar Navigation) */
-        [data-testid="stSidebar"] h1, 
-        [data-testid="stSidebar"] h2, 
-        [data-testid="stSidebar"] h3 {
-            color: #ffffff !important;
-            font-weight: 700 !important;
-        }
-
-        /* 3. Tombol Logout agar lebih mencolok */
-        [data-testid="stSidebar"] button {
-            background-color: #2563eb !important;
-            color: white !important;
-            width: 100%; /* Membuat tombol selebar sidebar jika diinginkan */
-            border-radius: 8px;
+        /* 4. Styling Radio Button (Dashboard & User) */
+        /* Mengubah warna teks pilihan agar hitam jelas */
+        div[data-testid="stWidgetLabel"] p, 
+        div[data-baseweb="radio"] label {
+            color: #000000 !important;
         }
         
-        /* 4. Background utama aplikasi tetap putih */
-        .stApp {
+        /* Memberi border hitam pada bulatan radio yang belum terpilih */
+        div[data-baseweb="radio"] div[role="presentation"] {
+            border: 1px solid #000000 !important;
+        }
+
+        /* 5. Kartu Konten dengan Border Hitam */
+        .skd-card {
             background-color: #ffffff;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 2px solid #000000; /* Border hitam tegas */
+            margin-bottom: 1.5rem;
+        }
+
+        /* 6. Tombol dengan Gaya Minimalis (Outline Hitam) */
+        div.stButton > button {
+            background-color: #ffffff !important;
+            color: #000000 !important;
+            border: 2px solid #000000 !important;
+            border-radius: 6px !important;
+            font-weight: bold !important;
+            transition: 0.3s;
+        }
+
+        /* Efek saat tombol dihover (Invert warna) */
+        div.stButton > button:hover {
+            background-color: #000000 !important;
+            color: #ffffff !important;
+        }
+
+        /* 7. Input Field (Search/Text Input) */
+        .stTextInput input {
+            border: 2px solid #000000 !important;
+            color: #000000 !important;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )def inject_global_css():
+    """Mengubah tema menjadi serba putih dengan aksen border hitam yang kontras."""
+    st.markdown(
+        """
+        <style>
+        /* 1. Background Utama & Sidebar jadi Putih */
+        .stApp, [data-testid="stSidebar"] {
+            background-color: #ffffff !important;
+        }
+
+        /* 2. Tambahkan Border Hitam pada Sidebar sebagai pemisah */
+        [data-testid="stSidebar"] {
+            border-right: 2px solid #000000 !important;
+        }
+
+        /* 3. Semua Teks di Sidebar & Utama jadi Hitam Pekat */
+        [data-testid="stSidebar"] .stMarkdown p,
+        [data-testid="stSidebar"] label,
+        [data-testid="stSidebar"] span,
+        [data-testid="stSidebar"] h1, h2, h3, p, label {
+            color: #000000 !important;
+            font-weight: 500;
+        }
+
+        /* 4. Styling Radio Button (Dashboard & User) */
+        /* Mengubah warna teks pilihan agar hitam jelas */
+        div[data-testid="stWidgetLabel"] p, 
+        div[data-baseweb="radio"] label {
+            color: #000000 !important;
+        }
+        
+        /* Memberi border hitam pada bulatan radio yang belum terpilih */
+        div[data-baseweb="radio"] div[role="presentation"] {
+            border: 1px solid #000000 !important;
+        }
+
+        /* 5. Kartu Konten dengan Border Hitam */
+        .skd-card {
+            background-color: #ffffff;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 2px solid #000000; /* Border hitam tegas */
+            margin-bottom: 1.5rem;
+        }
+
+        /* 6. Tombol dengan Gaya Minimalis (Outline Hitam) */
+        div.stButton > button {
+            background-color: #ffffff !important;
+            color: #000000 !important;
+            border: 2px solid #000000 !important;
+            border-radius: 6px !important;
+            font-weight: bold !important;
+            transition: 0.3s;
+        }
+
+        /* Efek saat tombol dihover (Invert warna) */
+        div.stButton > button:hover {
+            background-color: #000000 !important;
+            color: #ffffff !important;
+        }
+
+        /* 7. Input Field (Search/Text Input) */
+        .stTextInput input {
+            border: 2px solid #000000 !important;
+            color: #000000 !important;
         }
         </style>
         """,
