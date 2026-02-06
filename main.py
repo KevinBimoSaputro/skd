@@ -108,6 +108,18 @@ def inject_global_css():
             color: #000000 !important;
         }
 
+        /* 8. Code Blocks (st.code) agar tetap putih & teks hitam */
+        code, pre, [data-testid="stCodeBlock"] {
+            background-color: #ffffff !important;
+            color: #000000 !important;
+            border: 2px solid #000000 !important;
+        }
+
+        /* Memaksa warna teks di dalam pre/code */
+        pre span, code span {
+            color: #000000 !important;
+        }
+
         /* Menghilangkan bayangan/shadow agar clean */
         * {
             box-shadow: none !important;
