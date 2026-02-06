@@ -13,32 +13,38 @@ st.set_page_config(
 
 
 def inject_global_css():
-    """Styling global: background lebih terang & teks kontras supaya lebih jelas."""
+    """Styling global: tampilan kontras, form jelas, sidebar & kartu rapi."""
     st.markdown(
         """
         <style>
-        /* Background utama aplikasi */
+        /* ===================
+           BACKGROUND & TEXT
+           =================== */
         .stApp {
             background: #ffffff; /* putih */
             color: #111827; /* teks utama hitam pekat */
         }
 
-        /* Kontainer konten utama */
         .block-container {
             padding-top: 1.5rem;
             padding-bottom: 2.5rem;
             max-width: 1100px;
-            color: #111827; /* teks utama tetap hitam */
+            color: #111827;
         }
 
-        /* Sidebar: gelap & teks putih */
+        h1, h2, h3 {
+            color: #111827; /* judul/heading hitam */
+        }
+
+        /* ===================
+           SIDEBAR
+           =================== */
         section[data-testid="stSidebar"] {
             background-color: #1f2937 !important; /* gelap */
-            color: #ffffff !important; /* semua teks putih */
+            color: #ffffff !important; /* teks putih */
             border-right: 1px solid #9ca3af;
         }
 
-        /* Semua teks & label di sidebar jadi putih */
         section[data-testid="stSidebar"] label,
         section[data-testid="stSidebar"] .stMarkdown p,
         section[data-testid="stSidebar"] .stRadio label,
@@ -46,12 +52,9 @@ def inject_global_css():
             color: #ffffff !important;
         }
 
-        /* Judul & heading */
-        h1, h2, h3 {
-            color: #111827; /* hitam pekat */
-        }
-
-        /* Kartu putih untuk konten */
+        /* ===================
+           KARTU & TABEL
+           =================== */
         .skd-card {
             background-color: #f9fafb; /* abu terang */
             padding: 1.5rem 1.75rem;
@@ -59,45 +62,72 @@ def inject_global_css():
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
             border: 1px solid #d1d5db;
             margin-bottom: 1.5rem;
-            color: #111827; /* teks di kartu hitam pekat */
+            color: #111827;
         }
 
-        /* Tabel DataFrame lebih jelas */
         .skd-card table {
             border-collapse: collapse !important;
             border-radius: 12px;
             overflow: hidden;
         }
+
         .skd-card th {
-            background-color: #e5e7eb !important; /* abu header */
+            background-color: #e5e7eb !important;
             font-weight: 600 !important;
-            color: #111827 !important; /* teks header hitam */
-        }
-        .skd-card td, .skd-card th {
-            padding: 0.5rem 0.75rem !important;
-            color: #111827 !important; /* teks tabel hitam */
+            color: #111827 !important;
         }
 
-        /* Tombol lebih kontras & rounded */
+        .skd-card td, .skd-card th {
+            padding: 0.5rem 0.75rem !important;
+            color: #111827 !important;
+        }
+
+        /* ===================
+           TOMBOL
+           =================== */
         button[kind="primary"] {
             background-color: #2563eb !important; /* biru */
-            color: #ffffff !important; /* teks tombol putih */
+            color: #ffffff !important;
             border-radius: 999px !important;
         }
         button[kind="secondary"] {
             background-color: #f87171 !important; /* merah */
-            color: #ffffff !important; /* teks tombol putih */
+            color: #ffffff !important;
             border-radius: 999px !important;
         }
 
-        /* Link & teks interaktif */
         a, .stButton button {
             color: #2563eb !important;
         }
+
+        /* ===================
+           FORM INPUT / SELECT
+           =================== */
+        input, .stTextInput>div>input, .stNumberInput>div>input {
+            background-color: #ffffff !important; /* putih */
+            color: #111827 !important; /* teks hitam */
+            border: 1px solid #9ca3af !important; /* border abu gelap */
+            border-radius: 8px !important;
+            padding: 0.4rem 0.6rem !important;
+        }
+
+        .stTextInput>div>div>button {
+            color: #111827 !important; /* icon eye password */
+        }
+
+        select, .stSelectbox>div>select {
+            background-color: #ffffff !important;
+            color: #111827 !important;
+            border: 1px solid #9ca3af !important;
+            border-radius: 8px !important;
+            padding: 0.4rem 0.6rem !important;
+        }
+
         </style>
         """,
         unsafe_allow_html=True,
     )
+
 
 
 inject_global_css()
