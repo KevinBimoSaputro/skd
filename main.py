@@ -23,13 +23,23 @@ def inject_global_css():
             color: #000000 !important;
         }
 
-        /* 2. Sidebar Border */
+        /* 2. Sidebar & Header */
         [data-testid="stSidebar"] {
             border-right: 2px solid #000000 !important;
         }
 
+        /* Header background hitam agar ikon putih kontras */
+        header[data-testid="stHeader"] {
+            background-color: #000000 !important;
+            color: #ffffff !important;
+        }
+
+        /* Ikon Burger Menu Putih */
+        header[data-testid="stHeader"] svg {
+            fill: #ffffff !important;
+        }
+
         /* 3. Semua Input Field (Kolom Teks, Number, Selectbox, Multiselect) */
-        /* Menargetkan input, textarea, dan container selectbox */
         div[data-baseweb="input"], 
         div[data-baseweb="select"] > div, 
         div[data-baseweb="textarea"] textarea,
@@ -46,8 +56,14 @@ def inject_global_css():
             -webkit-text-fill-color: #000000 !important;
         }
 
-        /* 4. Teks Label & Header */
-        h1, h2, h3, h4, h5, h6, label, p, span, .stMarkdown {
+        /* 4. Teks Label & Header (Hitam Pekat) */
+        h1, h2, h3, h4, h5, h6, label, p, span, .stMarkdown, [data-testid="stWidgetLabel"] p {
+            color: #000000 !important;
+            font-weight: 600 !important;
+        }
+
+        /* Hilangkan teks abu-abu pada elemen Streamlit */
+        small, .stCaption {
             color: #000000 !important;
         }
 
@@ -55,13 +71,12 @@ def inject_global_css():
         div[data-baseweb="radio"] div {
             color: #000000 !important;
         }
-        /* Bulatan radio button */
         div[data-baseweb="radio"] div[role="presentation"] {
             border: 2px solid #000000 !important;
             background-color: #ffffff !important;
         }
 
-        /* 6. Tombol (Button) */
+        /* 6. Tombol (Button) - Putih dengan Teks Hitam */
         div.stButton > button {
             background-color: #ffffff !important;
             color: #000000 !important;
@@ -77,8 +92,14 @@ def inject_global_css():
         }
 
         /* 7. Dataframe / Tabel */
-        .styled-table, .stDataFrame {
+        .styled-table, .stDataFrame, [data-testid="stTable"] {
             border: 2px solid #000000 !important;
+            color: #000000 !important;
+        }
+
+        /* Isi tabel agar hitam */
+        [data-testid="stDataFrame"] div[role="gridcell"] {
+            color: #000000 !important;
         }
 
         /* Menghilangkan bayangan/shadow agar clean */
@@ -411,21 +432,21 @@ def grafik_dashboard():
     ax.plot(filtered["label"], filtered["twk"], marker="o", label="TWK")
     ax.plot(filtered["label"], filtered["tiu"], marker="o", label="TIU")
     ax.plot(filtered["label"], filtered["tkp"], marker="o", label="TKP")
-    ax.set_xlabel("User")
+    # ax.set_xlabel("User")
     ax.set_ylabel("Nilai")
     ax.set_title(f"Komponen Nilai SKD ({pilih_skd})")
     ax.legend()
-    plt.xticks(rotation=45, ha='right')
+    plt.xticks([]) # Sembunyikan label bawah sementara
     plt.tight_layout()
     st.pyplot(fig)
 
     st.subheader("Grafik Total Nilai")
     fig2, ax2 = plt.subplots(figsize=(10, 5))
     ax2.plot(filtered["label"], filtered["total"], marker="o", color='tab:orange')
-    ax2.set_xlabel("User")
+    # ax2.set_xlabel("User")
     ax2.set_ylabel("Total Nilai")
     ax2.set_title(f"Total Nilai SKD ({pilih_skd})")
-    plt.xticks(rotation=45, ha='right')
+    plt.xticks([]) # Sembunyikan label bawah sementara
     plt.tight_layout()
     st.pyplot(fig2)
 
@@ -456,24 +477,24 @@ def user_personal_dashboard(user: dict):
     ax.plot(x, df["twk"], marker="o", label="TWK")
     ax.plot(x, df["tiu"], marker="o", label="TIU")
     ax.plot(x, df["tkp"], marker="o", label="TKP")
-    ax.set_xlabel("Percobaan (SKD ke-)")
+    # ax.set_xlabel("Percobaan (SKD ke-)")
     ax.set_ylabel("Nilai")
     ax.set_title("Perkembangan Nilai TWK / TIU / TKP")
     ax.legend()
-    ax.set_xticks(x)
-    ax.set_xticklabels([f"SKD ke-{i}" for i in x])
-    plt.xticks(rotation=45)
+    # ax.set_xticks(x)
+    # ax.set_xticklabels([f"SKD ke-{i}" for i in x])
+    plt.xticks([]) # Sembunyikan label bawah sementara
     st.pyplot(fig)
 
     st.subheader("Grafik Total Nilai")
     fig2, ax2 = plt.subplots()
     ax2.plot(x, df["total"], marker="o")
-    ax2.set_xlabel("Percobaan (SKD ke-)")
+    # ax2.set_xlabel("Percobaan (SKD ke-)")
     ax2.set_ylabel("Total Nilai")
     ax2.set_title("Perkembangan Total Nilai SKD")
-    ax2.set_xticks(x)
-    ax2.set_xticklabels([f"SKD ke-{i}" for i in x])
-    plt.xticks(rotation=45)
+    # ax2.set_xticks(x)
+    # ax2.set_xticklabels([f"SKD ke-{i}" for i in x])
+    plt.xticks([]) # Sembunyikan label bawah sementara
     st.pyplot(fig2)
 
 
