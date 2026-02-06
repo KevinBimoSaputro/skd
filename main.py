@@ -1,10 +1,235 @@
 import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+import bcrypt
+
 from auth import login, logout
+from database import supabase
 
 st.set_page_config(
     page_title="SKD App",
     layout="wide"
 )
+
+
+# ======================
+# HELPER FUNCTIONS
+# ======================
+def fetch_all_users():
+    response = supabase.table("users").select("*").execute()
+    return getattr(response, "data", []) or []
+
+
+def admin_user_management():
+    st.header("User Management (Admin)")
+
+    users = fetch_all_users()
+    if users:
+        df = pd.DataFrame(users)
+        for col in ["twk", "tiu", "tkp", "total"]:
+            if col not in df.columns:
+                df[col] = 0
+        cols = [c for c in ["nama", "role", "twk", "tiu", "tkp", "total"] if c in df.columns]
+
+        st.subheader("Daftar User")
+        st.dataframe(df[cols])
+    else:
+        st.info("Belum ada user di database.")
+
+    st.markdown("---")
+
+    # Tambah user baru
+    st.subheader("Tambah User Baru")
+    with st.form("tambah_user"):
+        nama = st.text_input("Nama")
+        password = st.text_input("Password", type="password")
+        role = st.selectbox("Role", ["admin", "user"])
+        submitted_tambah = st.form_submit_button("Simpan User")
+
+    if submitted_tambah:
+        if not nama or not password:
+            st.error("Nama dan password wajib diisi.")
+        else:
+            existing = supabase.table("users").select("id").eq("nama", nama).execute()
+            if getattr(existing, "data", None):
+                st.error("Nama user sudah digunakan.")
+            else:
+                password_hash = bcrypt.hashpw(
+                    password.encode("utf-8"), bcrypt.gensalt()
+                ).decode("utf-8")
+                supabase.table("users").insert(
+                    {
+                        "nama": nama,
+                        "password": password_hash,
+                        "role": role,
+                        "twk": 0,
+                        "tiu": 0,
+                        "tkp": 0,
+                        "total": 0,
+                    }
+                ).execute()
+                st.success("User baru berhasil ditambahkan.")
+                st.rerun()
+
+    st.markdown("---")
+
+    # Edit user
+    st.subheader("Edit User")
+    users = fetch_all_users()
+    if users:
+        nama_list = [u["nama"] for u in users]
+        nama_pilih = st.selectbox("Pilih User", nama_list, key="edit_user_select")
+        user_pilih = next(u for u in users if u["nama"] == nama_pilih)
+
+        current_role = user_pilih.get("role", "user")
+        current_twk = user_pilih.get("twk") or 0
+        current_tiu = user_pilih.get("tiu") or 0
+        current_tkp = user_pilih.get("tkp") or 0
+
+        with st.form("edit_user"):
+            new_password = st.text_input(
+                "Password baru (kosongkan jika tidak diubah)", type="password"
+            )
+            new_role = st.selectbox(
+                "Role",
+                ["admin", "user"],
+                index=0 if current_role == "admin" else 1,
+            )
+            twk = st.number_input("TWK", min_value=0, value=int(current_twk))
+            tiu = st.number_input("TIU", min_value=0, value=int(current_tiu))
+            tkp = st.number_input("TKP", min_value=0, value=int(current_tkp))
+
+            submitted_edit = st.form_submit_button("Simpan Perubahan")
+
+        if submitted_edit:
+            update_data = {
+                "role": new_role,
+                "twk": twk,
+                "tiu": tiu,
+                "tkp": tkp,
+                "total": twk + tiu + tkp,
+            }
+            if new_password:
+                password_hash = bcrypt.hashpw(
+                    new_password.encode("utf-8"), bcrypt.gensalt()
+                ).decode("utf-8")
+                update_data["password"] = password_hash
+
+            supabase.table("users").update(update_data).eq(
+                "id", user_pilih["id"]
+            ).execute()
+            st.success("User berhasil diupdate.")
+            st.rerun()
+
+    st.markdown("---")
+
+    # Hapus user
+    st.subheader("Hapus User")
+    users = fetch_all_users()
+    if users:
+        nama_list_hapus = [u["nama"] for u in users]
+        nama_hapus = st.selectbox(
+            "Pilih User untuk dihapus", nama_list_hapus, key="delete_user_select"
+        )
+        user_hapus = next(u for u in users if u["nama"] == nama_hapus)
+
+        if st.button("Hapus User"):
+            supabase.table("users").delete().eq("id", user_hapus["id"]).execute()
+            st.success("User berhasil dihapus.")
+            st.rerun()
+
+
+def user_self_page(user: dict):
+    st.header("Profil & Nilai Saya")
+    st.write(f"Nama: **{user.get('nama')}**")
+    st.write(f"Role: **{user.get('role', 'user')}**")
+
+    st.markdown("---")
+    st.subheader("Update Nilai SKD")
+
+    current_twk = user.get("twk") or 0
+    current_tiu = user.get("tiu") or 0
+    current_tkp = user.get("tkp") or 0
+
+    with st.form("update_nilai_saya"):
+        twk = st.number_input("TWK", min_value=0, value=int(current_twk))
+        tiu = st.number_input("TIU", min_value=0, value=int(current_tiu))
+        tkp = st.number_input("TKP", min_value=0, value=int(current_tkp))
+        submitted_nilai = st.form_submit_button("Simpan Nilai")
+
+    if submitted_nilai:
+        total = twk + tiu + tkp
+        supabase.table("users").update(
+            {"twk": twk, "tiu": tiu, "tkp": tkp, "total": total}
+        ).eq("id", user["id"]).execute()
+
+        # update juga di session supaya tampilan langsung ikut berubah
+        user.update({"twk": twk, "tiu": tiu, "tkp": tkp, "total": total})
+        st.session_state.user = user
+
+        st.success("Nilai berhasil diupdate.")
+        st.rerun()
+
+
+def grafik_dashboard():
+    st.header("Dashboard & Grafik Nilai SKD")
+
+    users = fetch_all_users()
+    if not users:
+        st.info("Belum ada data user.")
+        return
+
+    df = pd.DataFrame(users)
+    for col in ["twk", "tiu", "tkp", "total"]:
+        if col not in df.columns:
+            df[col] = 0
+
+    st.subheader("Filter Data")
+    role_filter = st.selectbox("Filter berdasarkan role", ["Semua", "admin", "user"])
+    min_total = st.number_input("Minimal total skor", min_value=0, value=0)
+
+    filtered = df.copy()
+    if role_filter != "Semua" and "role" in filtered.columns:
+        filtered = filtered[filtered["role"] == role_filter]
+    filtered = filtered[filtered["total"] >= min_total]
+
+    if filtered.empty:
+        st.warning("Tidak ada data yang cocok dengan filter.")
+        return
+
+    st.subheader("Tabel Nilai User")
+    cols = [c for c in ["nama", "role", "twk", "tiu", "tkp", "total"] if c in filtered.columns]
+    st.dataframe(filtered[cols])
+
+    csv = filtered[cols].to_csv(index=False).encode("utf-8")
+    st.download_button(
+        "Download CSV",
+        csv,
+        "users_nilai.csv",
+        "text/csv",
+    )
+
+    st.subheader("Grafik Komponen Nilai")
+    fig, ax = plt.subplots()
+    ax.plot(filtered["nama"], filtered["twk"], marker="o", label="TWK")
+    ax.plot(filtered["nama"], filtered["tiu"], marker="o", label="TIU")
+    ax.plot(filtered["nama"], filtered["tkp"], marker="o", label="TKP")
+    ax.set_xlabel("User")
+    ax.set_ylabel("Nilai")
+    ax.set_title("Nilai TWK / TIU / TKP per User")
+    ax.legend()
+    plt.xticks(rotation=45)
+    st.pyplot(fig)
+
+    st.subheader("Grafik Total Nilai")
+    fig2, ax2 = plt.subplots()
+    ax2.plot(filtered["nama"], filtered["total"], marker="o")
+    ax2.set_xlabel("User")
+    ax2.set_ylabel("Total Nilai")
+    ax2.set_title("Total Nilai SKD per User")
+    plt.xticks(rotation=45)
+    st.pyplot(fig2)
+
 
 # ======================
 # LOGIN CHECK
@@ -12,38 +237,48 @@ st.set_page_config(
 if not login():
     st.stop()
 
+user = st.session_state.get("user")
+role = user.get("role", "user") if user else "user"
+
+
 # ======================
 # APP UTAMA
 # ======================
-
 st.title("📊 SKD Application")
 
 st.sidebar.title("Menu")
 
 menu = st.sidebar.selectbox(
     "Pilih Menu",
-    ["Item", "Grafik", "User"]
+    ["Dashboard", "Grafik", "User"]
 )
 
 logout()
 
 # ======================
-# HALAMAN ITEM
+# HALAMAN DASHBOARD (ringkas)
 # ======================
-if menu == "Item":
-    st.header("Data Item")
-    st.write("Halaman item tampil di sini")
+if menu == "Dashboard":
+    st.header("Ringkasan Nilai User")
+    grafik_dashboard()
 
 # ======================
-# HALAMAN GRAFIK
+# HALAMAN GRAFIK (khusus admin)
 # ======================
 elif menu == "Grafik":
-    st.header("Grafik")
-    st.write("Grafik tampil di sini")
+    if role != "admin":
+        st.warning("Halaman grafik lengkap hanya dapat diakses oleh admin.")
+        st.stop()
+    grafik_dashboard()
 
 # ======================
 # HALAMAN USER
 # ======================
 elif menu == "User":
-    st.header("User Management")
-    st.write("Data user tampil di sini")
+    if role == "admin":
+        admin_user_management()
+    else:
+        if user is None:
+            st.error("Data user tidak ditemukan di session.")
+        else:
+            user_self_page(user)
