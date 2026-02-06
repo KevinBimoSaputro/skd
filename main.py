@@ -17,76 +17,72 @@ def inject_global_css():
     st.markdown(
         """
         <style>
-        /* Background utama aplikasi: putih terang */
+        /* 1. Background utama: Putih Bersih */
         .stApp {
-            background: #ffffff;
+            background-color: #ffffff;
         }
 
-        /* Kontainer konten utama */
-        .block-container {
-            padding-top: 1.5rem;
-            padding-bottom: 2.5rem;
-            max-width: 1100px;
+        /* 2. Sidebar: Gelap dengan teks putih kontras */
+        [data-testid="stSidebar"] {
+            background-color: #111827 !important; /* Biru gelap/hitam */
+            border-right: 1px solid #374151;
         }
 
-        /* Sidebar: lebih gelap agar kontras dengan konten */
-        section[data-testid="stSidebar"] {
-            background-color: #1f2937; /* abu gelap */
-            color: #f9fafb; /* teks terang */
-            border-right: 1px solid #9ca3af;
+        /* Memastikan semua teks di sidebar berwarna putih terang */
+        [data-testid="stSidebar"] .stMarkdown p, 
+        [data-testid="stSidebar"] label, 
+        [data-testid="stSidebar"] span {
+            color: #ffffff !important;
+            font-weight: 500;
         }
 
-        /* Sidebar: teks & elemen lebih jelas */
-        section[data-testid="stSidebar"] label,
-        section[data-testid="stSidebar"] .stMarkdown p,
-        section[data-testid="stSidebar"] .stRadio label {
-            color: #f9fafb;
-        }
-
-        /* Judul & heading */
+        /* 3. Tipografi Konten Utama */
         h1, h2, h3 {
-            color: #111827; /* teks hitam pekat */
+            color: #000000 !important; /* Hitam pekat */
+            font-weight: 700 !important;
+        }
+        
+        p, span, label {
+            color: #1f2937; /* Abu gelap untuk readability */
         }
 
-        /* Kartu putih untuk membungkus konten utama */
+        /* 4. Kartu Konten (Custom Class: skd-card) */
         .skd-card {
-            background-color: #f9fafb; /* lebih terang dari putih murni */
-            padding: 1.5rem 1.75rem;
-            border-radius: 16px;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1); /* shadow lebih jelas */
-            border: 1px solid #d1d5db;
-            margin-bottom: 1.5rem;
-        }
-
-        /* Tabel DataFrame lebih jelas */
-        .skd-card table {
-            border-collapse: collapse !important;
+            background-color: #ffffff;
+            padding: 2rem;
             border-radius: 12px;
-            overflow: hidden;
-        }
-        .skd-card th {
-            background-color: #e5e7eb !important; /* abu terang */
-            font-weight: 600 !important;
-        }
-        .skd-card td, .skd-card th {
-            padding: 0.5rem 0.75rem !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e7eb;
+            margin-bottom: 2rem;
+            color: #111827;
         }
 
-        /* Tombol lebih kontras & rounded */
-        button[kind="primary"] {
-            background-color: #2563eb !important; /* biru pekat */
-            color: #ffffff !important;
-            border-radius: 999px !important;
-        }
-        button[kind="secondary"] {
-            background-color: #f87171 !important; /* merah/attention */
-            color: #ffffff !important;
-            border-radius: 999px !important;
+        /* 5. Styling Tombol (Primary & Secondary) */
+        div.stButton > button:first-child {
+            background-color: #2563eb; /* Biru terang */
+            color: white !important;
+            border-radius: 8px;
+            border: none;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
         }
 
-        /* Link & teks interaktif */
-        a, .stButton button {
-            color: #2563eb;
+        div.stButton > button:first-child:hover {
+            background-color: #1d4ed8; /* Biru lebih gelap saat hover */
+            border: none;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        /* 6. Tabel DataFrame agar lebih terbaca */
+        .stDataFrame {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+        }
+
+        /* Input Field styling */
+        .stTextInput input {
+            background-color: #f9fafb;
+            border: 1px solid #d1d5db !important;
         }
         </style>
         """,
