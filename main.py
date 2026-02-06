@@ -20,6 +20,28 @@ def fetch_all_users():
     return getattr(response, "data", []) or []
 
 
+def fetch_user_scores(user_id: str):
+    """Ambil semua riwayat nilai untuk satu user (scores table)."""
+    try:
+        response = (
+            supabase.table("scores")
+            .select("*")
+            .eq("user_id", user_id)
+            .order("created_at", desc=True)
+            .execute()
+        )
+        return getattr(response, "data", []) or []
+    except Exception:
+        # Jika tabel scores belum ada atau error lain, kembalikan list kosong
+        return []
+
+
+def fetch_latest_score(user_id: str):
+    """Ambil nilai terbaru user dari tabel scores."""
+    scores = fetch_user_scores(user_id)
+    return scores[0] if scores else None
+
+
 def admin_user_management():
     st.header("User Management (Admin)")
 
@@ -65,7 +87,6 @@ def admin_user_management():
                         "twk": 0,
                         "tiu": 0,
                         "tkp": 0,
-                        "total": 0,
                     }
                 ).execute()
                 st.success("User baru berhasil ditambahkan.")
@@ -107,7 +128,6 @@ def admin_user_management():
                 "twk": twk,
                 "tiu": tiu,
                 "tkp": tkp,
-                "total": twk + tiu + tkp,
             }
             if new_password:
                 password_hash = bcrypt.hashpw(
@@ -145,11 +165,12 @@ def user_self_page(user: dict):
     st.write(f"Role: **{user.get('role', 'user')}**")
 
     st.markdown("---")
-    st.subheader("Update Nilai SKD")
+    st.subheader("Input / Update Nilai SKD")
 
-    current_twk = user.get("twk") or 0
-    current_tiu = user.get("tiu") or 0
-    current_tkp = user.get("tkp") or 0
+    latest = fetch_latest_score(user["id"])
+    current_twk = (latest or {}).get("twk") or 0
+    current_tiu = (latest or {}).get("tiu") or 0
+    current_tkp = (latest or {}).get("tkp") or 0
 
     with st.form("update_nilai_saya"):
         twk = st.number_input("TWK", min_value=0, value=int(current_twk))
@@ -159,16 +180,40 @@ def user_self_page(user: dict):
 
     if submitted_nilai:
         total = twk + tiu + tkp
+        # Simpan sebagai percobaan baru di tabel scores
+        supabase.table("scores").insert(
+            {
+                "user_id": user["id"],
+                "twk": twk,
+                "tiu": tiu,
+                "tkp": tkp,
+                "total": total,
+            }
+        ).execute()
+
+        # Update ringkasan nilai terakhir di tabel users
         supabase.table("users").update(
-            {"twk": twk, "tiu": tiu, "tkp": tkp, "total": total}
+            {"twk": twk, "tiu": tiu, "tkp": tkp}
         ).eq("id", user["id"]).execute()
 
         # update juga di session supaya tampilan langsung ikut berubah
         user.update({"twk": twk, "tiu": tiu, "tkp": tkp, "total": total})
         st.session_state.user = user
 
-        st.success("Nilai berhasil diupdate.")
+        st.success("Nilai berhasil disimpan sebagai percobaan baru.")
         st.rerun()
+
+    st.markdown("---")
+    st.subheader("Riwayat Nilai SKD")
+
+    scores = fetch_user_scores(user["id"])
+    if scores:
+        df_scores = pd.DataFrame(scores)
+        # Tampilkan kolom yang paling penting saja jika ada
+        cols = [c for c in ["created_at", "twk", "tiu", "tkp", "total"] if c in df_scores.columns]
+        st.dataframe(df_scores[cols])
+    else:
+        st.info("Belum ada riwayat nilai. Silakan input nilai pertama Anda.")
 
 
 def grafik_dashboard():
@@ -184,8 +229,12 @@ def grafik_dashboard():
         if col not in df.columns:
             df[col] = 0
 
+    # Hilangkan admin dari tampilan nilai/grafik agar tidak makan tempat
+    if "role" in df.columns:
+        df = df[df["role"] != "admin"]
+
     st.subheader("Filter Data")
-    role_filter = st.selectbox("Filter berdasarkan role", ["Semua", "admin", "user"])
+    role_filter = st.selectbox("Filter berdasarkan role", ["Semua", "user"])
     min_total = st.number_input("Minimal total skor", min_value=0, value=0)
 
     filtered = df.copy()
