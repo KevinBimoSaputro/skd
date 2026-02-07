@@ -800,31 +800,32 @@ def admin_grafik_nilai():
     default_skd_idx = 1 if pilih_user != "Semua User" else 0
     pilih_skd = st.selectbox("Pilih Percobaan SKD (Attempt)", options, index=default_skd_idx)
 
-    rentang_aktif = False
-    if pilih_skd == "Rentang" or (pilih_skd == "Semua" and max_skd > 15):
-        st.markdown("### 🔍 Filter Rentang Data")
-        if pilih_skd == "Semua" and max_skd > 15:
-            st.info(f"Ditemukan {max_skd} data SKD. Silakan pilih rentang (Maksimal 15 data).")
+    # Range selector logic (always shown if data > 15 or "Rentang" selected)
+    r_dari, r_sampai = 1, max_skd
+    show_range = (max_skd > 15) or (pilih_skd == "Rentang")
+
+    if show_range:
+        st.markdown("### 🔍 Pilih Rentang Data")
+        if max_skd > 15:
+            st.info(f"Ditemukan {max_skd} data. Tampilan layar boleh semua, namun Cetak/Laporan dibatasi maksimal 15 data.")
 
         col_r1, col_r2 = st.columns(2)
         with col_r1:
-            # Default ke 15 data terakhir
-            default_dari = max(1, max_skd - 14)
+            default_dari = max(1, max_skd - 14) if max_skd > 15 else 1
             r_dari = st.number_input("Dari SKD ke-", min_value=1, max_value=max_skd, value=default_dari, key="admin_r_dari")
         with col_r2:
-            # Batasi input r_sampai maksimal r_dari + 14 (Total 15 data)
-            max_r_sampai_allowed = min(r_dari + 14, max_skd)
-            r_sampai = st.number_input("Sampai SKD ke-", min_value=r_dari, max_value=max_r_sampai_allowed, value=max_r_sampai_allowed, key="admin_r_sampai")
+            max_val = min(r_dari + 14, max_skd) if max_skd > 15 else max_skd
+            r_sampai = st.number_input("Sampai SKD ke-", min_value=r_dari, max_value=max_val, value=max_val, key="admin_r_sampai")
 
-        st.info(f"💡 Menampilkan data SKD ke-{r_dari} sampai ke-{r_sampai} (Maksimal 15 data).")
-
-        rentang_aktif = True
+        if max_skd > 15:
+            st.success(f"💡 Rentang Laporan: SKD ke-{r_dari} sampai ke-{r_sampai} (15 data).")
 
     if pilih_user != "Semua User":
         df = df[df["nama"] == pilih_user]
 
-    if rentang_aktif:
-        filtered = df[(df["skd_ke"] >= r_dari) & (df["skd_ke"] <= r_sampai)]
+    # Main Filtering for UI Display
+    if pilih_skd == "Rentang":
+        filtered = df[(df["skd_ke"] >= r_dari) & (df["skd_ke"] <= r_sampai)].copy()
         filtered = filtered.sort_values(["skd_ke", "nama"])
         st.subheader(f"Data SKD Rentang ke-{r_dari} sampai {r_sampai}")
     elif pilih_skd == "Terakhir":
@@ -852,7 +853,7 @@ def admin_grafik_nilai():
     # Pastikan filtered adalah copy untuk menghindari SettingWithCopyWarning
     filtered = filtered.copy()
 
-    # Siapkan Label untuk Grafik & Report
+    # Label for UI Chart
     if pilih_skd in ["Semua", "Rentang"]:
         if pilih_user == "Semua User":
             filtered["label"] = filtered["nama"] + " (SKD " + filtered["skd_ke"].astype(str) + ")"
@@ -861,32 +862,44 @@ def admin_grafik_nilai():
     else:
         filtered["label"] = filtered["nama"]
 
-    # Tampilkan Tabel
+    # Preparation for Report (Limited to 15 if data > 15)
+    if max_skd > 15:
+        report_df = df[(df["skd_ke"] >= r_dari) & (df["skd_ke"] <= r_sampai)].copy()
+    else:
+        report_df = filtered.copy()
+
+    if not report_df.empty:
+        if pilih_user == "Semua User":
+            report_df["label"] = report_df["nama"] + " (SKD " + report_df["skd_ke"].astype(str) + ")"
+        else:
+            report_df["label"] = "SKD ke-" + report_df["skd_ke"].astype(str)
+
+    # Tampilkan Tabel UI
     with st.container(border=True):
         st.subheader("Data Riwayat SKD")
         cols_to_show = ["nama", "skd_ke", "twk", "tiu", "tkp", "total"]
         st.dataframe(filtered[cols_to_show], use_container_width=True, hide_index=True)
 
-        # Tombol Download Laporan PNG - Terpisah Tabel & Grafik (Halaman 1 & 2)
-        report_title = f"Laporan SKD: {pilih_user} ({pilih_skd})"
-        filename_base = f"laporan_skd_{pilih_user}_{pilih_skd}".replace(" ", "_")
+        # Tombol Download Laporan PNG (Uses report_df)
+        report_title = f"Laporan SKD: {pilih_user} (SKD {r_dari}-{r_sampai})"
+        filename_base = f"laporan_skd_{pilih_user}_{r_dari}_{r_sampai}".replace(" ", "_")
         
         col_btn1, col_btn2 = st.columns(2)
         with col_btn1:
-            report_table = render_report_page(filtered, report_title, "table")
+            report_table = render_report_page(report_df, report_title, "table")
             if report_table:
                 st.download_button(
-                    label="📄 Download Tabel (Hal. 1)",
+                    label="📄 Download Tabel (Maks 15 Data)",
                     data=report_table,
                     file_name=f"{filename_base}_tabel.png",
                     mime="image/png",
                     use_container_width=True
                 )
         with col_btn2:
-            report_charts = render_report_page(filtered, report_title, "charts")
+            report_charts = render_report_page(report_df, report_title, "charts")
             if report_charts:
                 st.download_button(
-                    label="📊 Download Grafik (Hal. 2)",
+                    label="📊 Download Grafik (Maks 15 Data)",
                     data=report_charts,
                     file_name=f"{filename_base}_grafik.png",
                     mime="image/png",
@@ -954,49 +967,47 @@ def user_personal_dashboard(user: dict):
     df["skd_ke"] = range(1, len(df) + 1)
     df["label"] = "SKD ke-" + df["skd_ke"].astype(str)
 
-    # Filter Rentang jika data > 15
+    # Range selector for Reports
+    r_dari, r_sampai = 1, total_skd
     if total_skd > 15:
-        st.markdown("### 🔍 Filter Rentang Data")
-        st.info(f"Ditemukan {total_skd} data SKD. Silakan pilih rentang (Maksimal 15 data).")
+        st.markdown("### 🔍 Pilih Rentang Laporan")
+        st.info(f"Ditemukan {total_skd} data. Tampilan layar menampilkan semua, namun Cetak/Laporan dibatasi maksimal 15 data.")
         col_r1, col_r2 = st.columns(2)
         with col_r1:
-            # Default ke 15 data terakhir
             default_dari = max(1, total_skd - 14)
             r_dari = st.number_input("Dari SKD ke-", min_value=1, max_value=total_skd, value=default_dari, key="user_r_dari")
         with col_r2:
-            # Batasi input r_sampai maksimal r_dari + 14 (Total 15 data)
-            max_r_sampai_allowed = min(r_dari + 14, total_skd)
-            r_sampai = st.number_input("Sampai SKD ke-", min_value=r_dari, max_value=max_r_sampai_allowed, value=max_r_sampai_allowed, key="user_r_sampai")
+            max_val = min(r_dari + 14, total_skd)
+            r_sampai = st.number_input("Sampai SKD ke-", min_value=r_dari, max_value=max_val, value=max_val, key="user_r_sampai")
+        st.success(f"💡 Rentang Laporan: SKD ke-{r_dari} sampai ke-{r_sampai} (15 data).")
 
-        st.info(f"💡 Menampilkan data SKD ke-{r_dari} sampai ke-{r_sampai} (Maksimal 15 data).")
-
-        df = df[(df["skd_ke"] >= r_dari) & (df["skd_ke"] <= r_sampai)].copy()
+    report_df = df[(df["skd_ke"] >= r_dari) & (df["skd_ke"] <= r_sampai)].copy()
 
     with st.container(border=True):
         st.subheader("Riwayat Nilai")
         cols = [c for c in ["skd_ke", "twk", "tiu", "tkp", "total"] if c in df.columns]
         st.dataframe(df[cols], use_container_width=True, hide_index=True)
         
-        # Tombol Download Laporan PNG - Terpisah Tabel & Grafik (Halaman 1 & 2)
-        report_title = f"Laporan Hasil SKD: {user.get('nama')}"
-        filename_base = f"laporan_skd_{user.get('nama')}".replace(" ", "_")
+        # Tombol Download Laporan PNG (Uses report_df)
+        report_title = f"Laporan Hasil SKD: {user.get('nama')} (SKD {r_dari}-{r_sampai})"
+        filename_base = f"laporan_skd_{user.get('nama')}_{r_dari}_{r_sampai}".replace(" ", "_")
         
         col_btn1, col_btn2 = st.columns(2)
         with col_btn1:
-            report_table = render_report_page(df, report_title, "table")
+            report_table = render_report_page(report_df, report_title, "table")
             if report_table:
                 st.download_button(
-                    label="📄 Download Tabel (Hal. 1)",
+                    label="📄 Download Tabel (Maks 15 Data)",
                     data=report_table,
                     file_name=f"{filename_base}_tabel.png",
                     mime="image/png",
                     use_container_width=True
                 )
         with col_btn2:
-            report_charts = render_report_page(df, report_title, "charts")
+            report_charts = render_report_page(report_df, report_title, "charts")
             if report_charts:
                 st.download_button(
-                    label="📊 Download Grafik (Hal. 2)",
+                    label="📊 Download Grafik (Maks 15 Data)",
                     data=report_charts,
                     file_name=f"{filename_base}_grafik.png",
                     mime="image/png",
