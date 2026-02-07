@@ -13,21 +13,43 @@ st.set_page_config(
 
 
 def inject_global_css():
+    """Menerapkan Design System: Cerah, Modern, dan Vibran."""
     st.markdown(
         """
         <style>
         /* 1. Global Background & Text */
         .stApp {
-            background-color: #EAEFEF !important;
+            background-color: #F8FAFB !important; /* Lebih putih dari sebelumnya */
             color: #25343F !important;
         }
         
-        /* 7. Toast Notification (Fixed Middle Screen) */
-        @keyframes fadeInOutCenter {
-            0% { opacity: 0; transform: translate(-50%, -60%) scale(0.9); }
-            10% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-            90% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-            100% { opacity: 0; transform: translate(-50%, -40%) scale(0.9); }
+        /* 2. Sidebar yang lebih bersih */
+        [data-testid="stSidebar"] {
+            background-color: #FFFFFF !important;
+            border-right: 1px solid #EAEFEF !important;
+        }
+
+        /* 3. Primary Button - Sekarang pakai Orange agar cerah */
+        div.stButton > button, 
+        [data-testid="baseButton-primary"] {
+            background-color: #FF9B51 !important;
+            color: #FFFFFF !important;
+            border: none !important;
+            border-radius: 8px !important;
+            transition: all 0.2s ease;
+        }
+        div.stButton > button:hover {
+            background-color: #FF8631 !important;
+            transform: translateY(-1px);
+        }
+
+        /* 4. Pop-up / Toast Styling (Tengah Layar) */
+        @keyframes popIn {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            15% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+            20% { transform: translate(-50%, -50%) scale(1); }
+            85% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
         }
 
         .custom-toast-container {
@@ -35,44 +57,56 @@ def inject_global_css():
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            z-index: 999999;
+            z-index: 100000;
             pointer-events: none;
         }
 
         .custom-toast {
-            background-color: #FF9B51 !important; /* Warna Orange Aksen */
-            color: #25343F !important;            /* Teks Navy agar kontras (Bukan Putih!) */
-            padding: 20px 40px !important;
-            border-radius: 12px !important;
+            background: #FFFFFF !important; /* Putih bersih */
+            color: #25343F !important;
+            padding: 24px 40px !important;
+            border-radius: 20px !important;
+            display: flex;
+            flex-direction: column; /* Icon di atas, teks di bawah */
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 20px 50px rgba(37, 52, 63, 0.15) !important;
+            animation: popIn 4s ease-in-out forwards;
+            border: 3px solid #FF9B51 !important; /* Border orange sebagai penanda */
+            min-width: 280px;
+        }
+
+        .toast-icon {
+            font-size: 40px;
+            background: #FF9B51;
+            width: 60px;
+            height: 60px;
             display: flex;
             align-items: center;
-            gap: 15px;
-            box-shadow: 0 15px 35px rgba(37, 52, 63, 0.2) !important;
-            animation: fadeInOutCenter 4s ease-in-out forwards;
-            font-weight: 700 !important;
-            font-size: 1.1rem !important;
-            border: 2px solid #25343F;
-            min-width: 320px;
             justify-content: center;
+            border-radius: 50%;
+            color: white;
+            margin-bottom: 5px;
         }
         </style>
         """,
         unsafe_allow_html=True,
     )
 
-def show_toast(message: str):
-    # Menggunakan st.chat_message atau placeholder agar tidak memakan space layout
+def show_toast(message: str, icon: str = "✅"):
+    """Menampilkan pop-up cerah di tengah layar."""
     st.markdown(
         f"""
         <div class="custom-toast-container">
             <div class="custom-toast">
-                <span>⚡</span>
-                <span>{message}</span>
+                <div class="toast-icon">{icon}</div>
+                <div style="font-weight: 700; font-size: 1.1rem;">{message}</div>
             </div>
         </div>
         """,
         unsafe_allow_html=True
     )
+    
 def fetch_all_users():
     response = supabase.table("users").select("*").execute()
     return getattr(response, "data", []) or []
