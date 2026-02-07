@@ -60,24 +60,56 @@ def inject_global_css():
         """,
         unsafe_allow_html=True,
     )
-inject_global_css()
 
-
-# ======================
-# HELPER FUNCTIONS
-# ======================
-def show_toast(message: str):
-    """Menampilkan notifikasi toast custom di posisi top-center."""
+def inject_global_css():
     st.markdown(
-        f"""
-        <div class="custom-toast">
-            <span>✅</span>
-            <span>{message}</span>
-        </div>
+        """
+        <style>
+        /* Animasi Pop-up Tengah */
+        @keyframes popMiddle {
+            0% { opacity: 0; transform: translate(-50%, -60%) scale(0.8); }
+            15% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+            20% { transform: translate(-50%, -50%) scale(1); }
+            85% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -40%) scale(0.9); }
+        }
+
+        .custom-toast-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 999999;
+            pointer-events: none;
+        }
+
+        .custom-toast {
+            background: linear-gradient(135deg, #FF9B51 0%, #FF7E21 100%) !important;
+            color: white !important;
+            padding: 25px 50px !important;
+            border-radius: 20px !important;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(255, 126, 33, 0.4) !important;
+            border: 2px solid rgba(255, 255, 255, 0.3) !important;
+            animation: popMiddle 3.5s ease-in-out forwards;
+            min-width: 320px;
+        }
+
+        .toast-icon {
+            font-size: 40px !important;
+            display: block !important;
+            margin-bottom: 10px !important;
+        }
+
+        .toast-text {
+            font-size: 1.2rem !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.5px !important;
+        }
+        </style>
         """,
         unsafe_allow_html=True
     )
-
 
 def fetch_all_users():
     response = supabase.table("users").select("*").execute()
