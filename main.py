@@ -13,103 +13,178 @@ st.set_page_config(
 
 
 def inject_global_css():
+    """Menerapkan Design System baru: Minimalis, Profesional, dan Modern."""
     st.markdown(
         """
         <style>
-        /* 1. Aturan Seragam untuk SEMUA Tombol (Sidebar & Main Content) */
+        /* 1. Global Background & Text */
+        .stApp {
+            background-color: #EAEFEF !important;
+            color: #25343F !important;
+        }
+        
+        [data-testid="stSidebar"] {
+            background-color: #FFFFFF !important;
+            border-right: 1px solid #BFC9D1 !important;
+        }
+
+        /* 2. Header / Top Navigation */
+        header[data-testid="stHeader"] {
+            background-color: #25343F !important;
+            color: #FFFFFF !important;
+        }
+        header[data-testid="stHeader"] svg {
+            fill: #FFFFFF !important;
+        }
+
+        /* 3. Cards Styling */
+        .main-card {
+            background-color: #FFFFFF !important;
+            border: 1px solid #BFC9D1 !important;
+            border-radius: 8px !important;
+            padding: 20px !important;
+            margin-bottom: 20px !important;
+        }
+
+        /* 4. Input Fields Styling */
+        div[data-baseweb="input"], 
+        div[data-baseweb="select"] > div, 
+        div[data-baseweb="textarea"] textarea,
+        .stTextInput input, .stNumberInput input, .stSelectbox div[role="button"] {
+            background-color: #FFFFFF !important;
+            color: #25343F !important;
+            border: 1px solid #BFC9D1 !important;
+            border-radius: 6px !important;
+        }
+
+        /* 5. Typography */
+        h1, h2, h3, h4, h5, h6, label, p, span, .stMarkdown {
+            color: #25343F !important;
+        }
+        [data-testid="stWidgetLabel"] p {
+            font-weight: 500 !important;
+            color: #25343F !important;
+        }
+        /* Text Sekunder */
+        .stCaption, small {
+            color: rgba(37, 52, 63, 0.7) !important;
+        }
+
+        /* 6. Buttons Styling (Primary, Secondary, Accent) */
+        /* Primary Buttons */
         div.stButton > button, 
-        div.stDownloadButton > button, 
-        div[data-testid="stFormSubmitButton"] > button {
-            background: linear-gradient(135deg, #FF9B51 0%, #FF7E21 100%) !important;
+        div[data-testid="stFormSubmitButton"] > button,
+        [data-testid="baseButton-primary"] {
+            background-color: #25343F !important;
             color: #FFFFFF !important;
             border: none !important;
-            border-radius: 12px !important; /* Membuat sudut lebih halus/rounded */
+            border-radius: 6px !important;
             padding: 10px 20px !important;
-            font-weight: 700 !important;
-            font-size: 1rem !important;
-            text-align: center !important;
-            box-shadow: 0 4px 15px rgba(255, 126, 33, 0.25) !important;
-            transition: all 0.3s ease-in-out !important;
-            width: 100% !important; /* Supaya seragam memenuhi lebar container */
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            gap: 10px !important;
+            font-weight: 600 !important;
+            transition: all 0.3s ease !important;
+        }
+        div.stButton > button:hover,
+        div[data-testid="stFormSubmitButton"] > button:hover,
+        [data-testid="baseButton-primary"]:hover {
+            background-color: #354a5a !important;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
         }
 
-        /* 2. Efek Hover untuk semua tombol */
-        div.stButton > button:hover, 
+        /* Secondary / Download Buttons */
+        div.stDownloadButton > button,
+        [data-testid="baseButton-secondary"] {
+            background-color: #FFFFFF !important;
+            color: #25343F !important;
+            border: 1px solid #25343F !important;
+            border-radius: 6px !important;
+        }
         div.stDownloadButton > button:hover,
-        div[data-testid="stFormSubmitButton"] > button:hover {
-            transform: translateY(-2px) !important;
-            box-shadow: 0 8px 25px rgba(255, 126, 33, 0.4) !important;
-            filter: brightness(1.1) !important;
+        [data-testid="baseButton-secondary"]:hover {
+            background-color: #f8f9f9 !important;
+            color: #25343F !important;
+            border-color: #354a5a !important;
         }
 
-        /* 3. Menghilangkan garis outline hitam saat diklik (Focus state) */
-        button:focus:not(:focus-visible) {
-            outline: none !important;
+        /* Accent Elements */
+        .accent-box {
+            background-color: #FF9B51 !important;
+            color: #FFFFFF !important;
+            padding: 8px 12px !important;
+            border-radius: 6px !important;
+            font-weight: 600 !important;
+        }
+
+        /* 7. Toast Notification (Center, smooth fade) */
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translate(-50%, -60%); }
+            10% { opacity: 1; transform: translate(-50%, -50%); }
+            90% { opacity: 1; transform: translate(-50%, -50%); }
+            100% { opacity: 0; transform: translate(-50%, -40%); }
+        }
+        .custom-toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #FF9B51 !important;
+            color: #FFFFFF !important;
+            padding: 12px 24px !important;
+            border-radius: 8px !important;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+            animation: fadeInOut 4s ease-in-out forwards;
+            font-weight: 600 !important;
+            font-size: 1rem !important;
+            white-space: nowrap;
+            justify-content: center;
+        }
+
+        /* 8. Table Styling */
+        [data-testid="stDataFrame"], [data-testid="stTable"] {
+            border: 1px solid #BFC9D1 !important;
+            border-radius: 8px !important;
+            overflow: hidden !important;
+        }
+
+        /* 9. Container Border (Cards) */
+        [data-testid="stVerticalBlockBorderWrapper"] {
+            background-color: #FFFFFF !important;
+            border: 1px solid #BFC9D1 !important;
+            border-radius: 8px !important;
+            padding: 10px !important;
+        }
+        
+        /* 10. Hilangkan shadow default Streamlit */
+        * {
             box-shadow: none !important;
         }
 
-        /* 4. Khusus Sidebar: Pastikan tombol logout tidak mepet */
-        [data-testid="stSidebar"] div.stButton {
-            padding: 0 10px !important;
-        }
         </style>
         """,
         unsafe_allow_html=True,
     )
 
-def inject_global_css():
+inject_global_css()
+
+
+# ======================
+# HELPER FUNCTIONS
+# ======================
+def show_toast(message: str):
+    """Menampilkan notifikasi toast custom di posisi top-center."""
     st.markdown(
-        """
-        <style>
-        /* Animasi Pop-up Tengah */
-        @keyframes popMiddle {
-            0% { opacity: 0; transform: translate(-50%, -60%) scale(0.8); }
-            15% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
-            20% { transform: translate(-50%, -50%) scale(1); }
-            85% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-            100% { opacity: 0; transform: translate(-50%, -40%) scale(0.9); }
-        }
-
-        .custom-toast-container {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 999999;
-            pointer-events: none;
-        }
-
-        .custom-toast {
-            background: linear-gradient(135deg, #FF9B51 0%, #FF7E21 100%) !important;
-            color: white !important;
-            padding: 25px 50px !important;
-            border-radius: 20px !important;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(255, 126, 33, 0.4) !important;
-            border: 2px solid rgba(255, 255, 255, 0.3) !important;
-            animation: popMiddle 3.5s ease-in-out forwards;
-            min-width: 320px;
-        }
-
-        .toast-icon {
-            font-size: 40px !important;
-            display: block !important;
-            margin-bottom: 10px !important;
-        }
-
-        .toast-text {
-            font-size: 1.2rem !important;
-            font-weight: 700 !important;
-            letter-spacing: 0.5px !important;
-        }
-        </style>
+        f"""
+        <div class="custom-toast">
+            <span>✅</span>
+            <span>{message}</span>
+        </div>
         """,
         unsafe_allow_html=True
     )
+
 
 def fetch_all_users():
     response = supabase.table("users").select("*").execute()
