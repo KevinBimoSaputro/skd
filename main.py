@@ -117,7 +117,7 @@ def inject_global_css():
         div.stDownloadButton > button:hover,
         [data-testid="baseButton-secondary"]:hover {
             background-color: #f8f9f9 !important;
-            color: #25343F !important;
+            color: #FFFFFF !important;
             border-color: #354a5a !important;
         }
 
