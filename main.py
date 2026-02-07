@@ -87,39 +87,33 @@ def inject_global_css():
             color: rgba(37, 52, 63, 0.7) !important;
         }
 
-        /* 6. Buttons Styling (Primary, Secondary, Accent) */
-        /* Primary Buttons */
+        /* 6. Buttons Styling (Unified for all types) */
         div.stButton > button, 
-        div[data-testid="stFormSubmitButton"] > button,
-        [data-testid="baseButton-primary"] {
-            background-color: #FFFFFF !important;
-            color: #FFFFFF !important;
-            border: 1px solid #25343F !important;
-            border-radius: 6px !important;
-            padding: 10px 20px !important;
-            font-weight: 600 !important;
-            transition: all 0.3s ease !important;
-        }
-        div.stButton > button:hover,
-        div[data-testid="stFormSubmitButton"] > button:hover,
-        [data-testid="baseButton-primary"]:hover {
-            background-color: #FFFFFF !important;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
-        }
-
-        /* Secondary / Download Buttons */
         div.stDownloadButton > button,
+        div[data-testid="stFormSubmitButton"] > button,
+        [data-testid="baseButton-primary"],
         [data-testid="baseButton-secondary"] {
             background-color: #FFFFFF !important;
             color: #25343F !important;
             border: 1px solid #BFC9D1 !important;
             border-radius: 6px !important;
+            padding: 10px 20px !important;
+            font-weight: 600 !important;
+            min-height: 45px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: all 0.3s ease !important;
         }
+
+        div.stButton > button:hover,
         div.stDownloadButton > button:hover,
+        div[data-testid="stFormSubmitButton"] > button:hover,
+        [data-testid="baseButton-primary"]:hover,
         [data-testid="baseButton-secondary"]:hover {
             background-color: #f8f9f9 !important;
-            color: #25343F !important;
             border-color: #25343F !important;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
         }
 
         /* Accent Elements */
