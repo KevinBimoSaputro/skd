@@ -13,159 +13,136 @@ st.set_page_config(
 
 
 def inject_global_css():
-    """Menerapkan Design System baru: Minimalis, Profesional, dan Modern."""
+    """Menerapkan Design System Modern: Depth, Soft Gradients, dan Vibrant Accents."""
     st.markdown(
         """
         <style>
-        /* 1. Global Background & Text */
+        /* 1. Global Background - Tidak polos banget, ada sedikit tekstur warna */
         .stApp {
-            background-color: #EAEFEF !important;
+            background-color: #F8FAFA !important;
             color: #25343F !important;
         }
         
+        /* 2. Sidebar - Bersih dengan bayangan tipis di kanan */
         [data-testid="stSidebar"] {
             background-color: #FFFFFF !important;
-            border-right: 1px solid #BFC9D1 !important;
+            border-right: 1px solid rgba(191, 201, 209, 0.4) !important;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.02) !important;
         }
 
-        /* 2. Header / Top Navigation */
+        /* 3. Header - Gelap & Profesional */
         header[data-testid="stHeader"] {
             background-color: #25343F !important;
             color: #FFFFFF !important;
         }
-        header[data-testid="stHeader"] svg {
-            fill: #FFFFFF !important;
-        }
 
-        /* 3. Cards Styling */
-        .main-card {
+        /* 4. Cards (Container) - Efek Mengambang (Floating Depth) */
+        [data-testid="stVerticalBlockBorderWrapper"] {
             background-color: #FFFFFF !important;
-            border: 1px solid #BFC9D1 !important;
-            border-radius: 8px !important;
-            padding: 20px !important;
+            border: 1px solid rgba(191, 201, 209, 0.3) !important;
+            border-radius: 16px !important;
+            padding: 25px !important;
+            box-shadow: 0 10px 25px rgba(37, 52, 63, 0.05) !important;
             margin-bottom: 20px !important;
         }
 
-        /* 4. Input Fields Styling */
-        div[data-baseweb="input"], 
-        div[data-baseweb="select"] > div, 
-        div[data-baseweb="textarea"] textarea,
-        .stTextInput input, .stNumberInput input, .stSelectbox div[role="button"] {
-            background-color: #FFFFFF !important;
+        /* 5. Typography - Kontras Tinggi */
+        h1, h2, h3 {
             color: #25343F !important;
-            border: 1px solid #BFC9D1 !important;
-            border-radius: 6px !important;
+            font-weight: 800 !important;
+            letter-spacing: -0.5px !important;
+        }
+        label p {
+            font-weight: 600 !important;
+            color: #4A5568 !important;
         }
 
-        /* 5. Typography */
-        h1, h2, h3, h4, h5, h6, label, p, span, .stMarkdown {
-            color: #25343F !important;
-        }
-        [data-testid="stWidgetLabel"] p {
-            font-weight: 500 !important;
-            color: #25343F !important;
-        }
-        /* Text Sekunder */
-        .stCaption, small {
-            color: rgba(37, 52, 63, 0.7) !important;
-        }
-
-        /* 6. Buttons Styling (Primary, Secondary, Accent) */
-        /* Primary Buttons */
+        /* 6. Buttons - Gradasi Modern */
         div.stButton > button, 
-        div[data-testid="stFormSubmitButton"] > button,
-        [data-testid="baseButton-primary"] {
-            background-color: #25343F !important;
+        div[data-testid="stFormSubmitButton"] > button {
+            background: linear-gradient(135deg, #25343F 0%, #354a5a 100%) !important;
             color: #FFFFFF !important;
             border: none !important;
-            border-radius: 6px !important;
-            padding: 10px 20px !important;
+            border-radius: 10px !important;
+            padding: 12px 24px !important;
             font-weight: 600 !important;
-            transition: all 0.3s ease !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            width: 100%;
         }
-        div.stButton > button:hover,
-        div[data-testid="stFormSubmitButton"] > button:hover,
-        [data-testid="baseButton-primary"]:hover {
-            background-color: #354a5a !important;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+        
+        div.stButton > button:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 8px 20px rgba(37, 52, 63, 0.2) !important;
+            opacity: 0.95;
         }
 
-        /* Secondary / Download Buttons */
-        div.stDownloadButton > button,
-        [data-testid="baseButton-secondary"] {
-            background-color: #FFFFFF !important;
+        /* Tombol Download/Secondary */
+        div.stDownloadButton > button {
+            background: #FFFFFF !important;
+            border: 2px solid #25343F !important;
             color: #25343F !important;
-            border: 1px solid #25343F !important;
-            border-radius: 6px !important;
-        }
-        div.stDownloadButton > button:hover,
-        [data-testid="baseButton-secondary"]:hover {
-            background-color: #f8f9f9 !important;
-            color: #25343F !important;
-            border-color: #354a5a !important;
+            border-radius: 10px !important;
         }
 
-        /* Accent Elements */
-        .accent-box {
-            background-color: #FF9B51 !important;
-            color: #FFFFFF !important;
-            padding: 8px 12px !important;
-            border-radius: 6px !important;
-            font-weight: 600 !important;
-        }
-
-        /* 7. Toast Notification (Center, smooth fade) */
-        @keyframes fadeInOut {
-            0% { opacity: 0; transform: translate(-50%, -60%); }
-            10% { opacity: 1; transform: translate(-50%, -50%); }
+        /* 7. Pop-up Toast - Gradasi Vibrant Orange (Eye-catching) */
+        @keyframes popIn {
+            0% { opacity: 0; transform: translate(-50%, -60%) scale(0.9); }
+            15% { opacity: 1; transform: translate(-50%, -50%) scale(1.02); }
+            20% { transform: translate(-50%, -50%) scale(1); }
             90% { opacity: 1; transform: translate(-50%, -50%); }
             100% { opacity: 0; transform: translate(-50%, -40%); }
         }
+
         .custom-toast {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: #FF9B51 !important;
+            background: linear-gradient(135deg, #FF9B51 0%, #FF7E21 100%) !important;
             color: #FFFFFF !important;
-            padding: 12px 24px !important;
-            border-radius: 8px !important;
+            padding: 20px 40px !important;
+            border-radius: 20px !important;
             z-index: 10000;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 12px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
-            animation: fadeInOut 4s ease-in-out forwards;
-            font-weight: 600 !important;
-            font-size: 1rem !important;
-            white-space: nowrap;
-            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 20px 40px rgba(255, 126, 33, 0.3) !important;
+            animation: popIn 4s ease-in-out forwards;
+            min-width: 300px;
+            border: 2px solid rgba(255,255,255,0.2);
         }
 
-        /* 8. Table Styling */
-        [data-testid="stDataFrame"], [data-testid="stTable"] {
-            border: 1px solid #BFC9D1 !important;
-            border-radius: 8px !important;
-            overflow: hidden !important;
-        }
-
-        /* 9. Container Border (Cards) */
-        [data-testid="stVerticalBlockBorderWrapper"] {
-            background-color: #FFFFFF !important;
-            border: 1px solid #BFC9D1 !important;
-            border-radius: 8px !important;
+        /* 8. Inputs & Selectbox */
+        .stTextInput input, .stNumberInput input, .stSelectbox div[role="button"] {
+            border-radius: 10px !important;
+            border: 1px solid #E2E8F0 !important;
             padding: 10px !important;
+            transition: border 0.3s ease !important;
         }
-        
-        /* 10. Hilangkan shadow default Streamlit */
-        * {
-            box-shadow: none !important;
+        .stTextInput input:focus {
+            border-color: #FF9B51 !important;
+        }
+
+        /* 9. Sidebar Brand Header */
+        .sidebar-brand {
+            padding: 20px;
+            text-align: center;
+            background: linear-gradient(135deg, #25343F 0%, #1a252d 100%);
+            border-radius: 12px;
+            margin-bottom: 25px;
+            color: white;
+        }
+
+        /* 10. Hide Default Streamlit Header Element */
+        [data-testid="stSidebarHeader"] {
+            display: none !important;
         }
         </style>
         """,
         unsafe_allow_html=True,
     )
-
+    
 inject_global_css()
 
 
