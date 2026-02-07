@@ -20,7 +20,6 @@ def _get_user_by_username(username: str):
 
 def login():
     """Halaman login & registrasi dengan penyimpanan user di session_state."""
-    st.title("🔐 SKD App")
 
     # kalau sudah login, tidak perlu login lagi
     if st.session_state.get("user") is not None:
