@@ -12,6 +12,22 @@ st.set_page_config(
 )
 
 
+# ======================
+# HELPER FUNCTIONS
+# ======================
+def show_toast(message: str):
+    """Menampilkan notifikasi toast custom di posisi top-center."""
+    st.markdown(
+        f"""
+        <div class="custom-toast">
+            <span>✅</span>
+            <span>{message}</span>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+
 def inject_global_css():
     """Menerapkan Design System baru: Minimalis, Profesional, dan Modern."""
     st.markdown(
@@ -168,22 +184,6 @@ def inject_global_css():
     )
 
 inject_global_css()
-
-
-# ======================
-# HELPER FUNCTIONS
-# ======================
-def show_toast(message: str):
-    """Menampilkan notifikasi toast custom di posisi top-center."""
-    st.markdown(
-        f"""
-        <div class="custom-toast">
-            <span>✅</span>
-            <span>{message}</span>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
 
 
 def fetch_all_users():
