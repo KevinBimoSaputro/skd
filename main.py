@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import bcrypt
 import io
-import zipfile
+from PIL import Image
 
 from auth import login, logout
 from database import supabase
@@ -318,107 +318,109 @@ def render_skd_chart(df, title, is_component=True):
 
 
 @st.cache_data(show_spinner=False)
-def render_table_to_bytes(df, title):
-    """Render tabel sebagai PNG bytes."""
+def render_report_page(df, title, content_type="table"):
+    """
+    Render satu halaman laporan (Tabel atau Grafik) dengan ukuran A4 (approx 8.27x11.69 inch).
+    """
     if df.empty: return None
-    num_data = len(df)
 
-    # Estimasi ukuran berdasarkan kolom dan baris
-    fig, ax = plt.subplots(figsize=(max(8, 6), max(2, (num_data + 1) * 0.5)), dpi=100)
-    ax.axis('off')
+    # Ukuran A4 Portrait (inch)
+    figsize_a4 = (8.27, 11.69)
+    fig = plt.figure(figsize=figsize_a4, dpi=100)
 
-    cols_to_show = ["skd_ke", "twk", "tiu", "tkp", "total"]
-    if "nama" in df.columns and len(df["nama"].unique()) > 1:
-        cols_to_show = ["nama"] + cols_to_show
+    color_primary = "#25343F"
 
-    table_data = df[cols_to_show].copy()
-    rename_map = {"skd_ke": "SKD ke-", "twk": "TWK", "tiu": "TIU", "tkp": "TKP", "total": "Total", "nama": "Nama"}
-    table_data = table_data.rename(columns=rename_map)
+    if content_type == "table":
+        ax = fig.add_subplot(111)
+        ax.axis('off')
 
-    the_table = ax.table(
-        cellText=table_data.values,
-        colLabels=table_data.columns,
-        cellLoc='center',
-        loc='center'
-    )
-    the_table.auto_set_font_size(False)
-    the_table.set_fontsize(10)
-    the_table.scale(1.0, 1.8)
+        cols_to_show = ["skd_ke", "twk", "tiu", "tkp", "total"]
+        if "nama" in df.columns and len(df["nama"].unique()) > 1:
+            cols_to_show = ["nama"] + cols_to_show
 
-    for (row, col), cell in the_table.get_celld().items():
-        if row == 0:
-            cell.set_text_props(weight='bold', color='white')
-            cell.set_facecolor('#25343F')
-        elif row > 0:
-            cell.set_facecolor('#F8F9F9')
+        table_data = df[cols_to_show].copy()
+        rename_map = {"skd_ke": "SKD ke-", "twk": "TWK", "tiu": "TIU", "tkp": "TKP", "total": "Total", "nama": "Nama"}
+        table_data = table_data.rename(columns=rename_map)
 
-    ax.set_title(title, fontsize=14, fontweight='bold', pad=15, color='#25343F')
+        the_table = ax.table(
+            cellText=table_data.values,
+            colLabels=table_data.columns,
+            cellLoc='center',
+            loc='center'
+        )
+        the_table.auto_set_font_size(False)
+        the_table.set_fontsize(10)
+        # Scale lebih besar untuk mengisi halaman A4
+        the_table.scale(1.2, 2.8)
+
+        for (row, col), cell in the_table.get_celld().items():
+            if row == 0:
+                cell.set_text_props(weight='bold', color='white')
+                cell.set_facecolor(color_primary)
+            elif row > 0:
+                cell.set_facecolor('#F8F9F9')
+
+        plt.title(title + "\n(Halaman 1: Tabel Nilai)", fontsize=16, fontweight='bold', pad=30, color=color_primary)
+
+    else:
+        # Grafik - 2 grafik ditumpuk vertikal
+        ax_comp = fig.add_subplot(2, 1, 1)
+        ax_total = fig.add_subplot(2, 1, 2)
+
+        color_twk = "#25343F"
+        color_tiu = "#78909C"
+        color_tkp = "#FB8C00"
+
+        # Pastikan data terurut
+        if "skd_ke" in df.columns:
+            df = df.sort_values("skd_ke")
+
+        # Grafik Komponen
+        ax_comp.plot(df["label"], df["twk"], marker="o", label="TWK", color=color_twk, linewidth=3)
+        ax_comp.plot(df["label"], df["tiu"], marker="o", label="TIU", color=color_tiu, linewidth=3)
+        ax_comp.plot(df["label"], df["tkp"], marker="o", label="TKP", color=color_tkp, linewidth=3)
+        ax_comp.set_ylabel("Nilai", color=color_twk, fontweight='bold')
+        ax_comp.set_title("Grafik Komponen Nilai SKD", fontsize=14, fontweight='bold', pad=10, color=color_twk)
+        ax_comp.legend(loc='upper left', bbox_to_anchor=(1, 1))
+        ax_comp.grid(True, linestyle='--', alpha=0.6)
+        ax_comp.tick_params(axis='x', rotation=45)
+
+        # Grafik Total
+        ax_total.plot(df["label"], df["total"], marker="o", color=color_twk, linewidth=3.5, label="Total")
+        ax_total.set_ylabel("Total Nilai", color=color_twk, fontweight='bold')
+        ax_total.set_title("Grafik Total Nilai SKD", fontsize=14, fontweight='bold', pad=10, color=color_twk)
+        ax_total.legend(loc='upper left', bbox_to_anchor=(1, 1))
+        ax_total.grid(True, linestyle='--', alpha=0.6)
+        ax_total.tick_params(axis='x', rotation=45)
+
+        fig.suptitle(title + "\n(Halaman 2: Grafik Perkembangan)", fontsize=16, fontweight='bold', y=0.98, color=color_twk)
+        plt.tight_layout(rect=[0, 0, 1, 0.95])
 
     buf = io.BytesIO()
     fig.savefig(buf, format="png", bbox_inches="tight")
     plt.close(fig)
-    return buf.getvalue()
+    return Image.open(buf)
 
 @st.cache_data(show_spinner=False)
-def render_charts_to_bytes(df, title):
-    """Render grafik komponen dan total sebagai satu PNG bytes."""
-    if df.empty: return None
+def get_consolidated_report(df, title):
+    """Menggabungkan Halaman Tabel dan Halaman Grafik menjadi satu PNG panjang."""
+    img_table = render_report_page(df, title, "table")
+    img_charts = render_report_page(df, title, "charts")
 
-    # Pastikan data terurut
-    if "skd_ke" in df.columns:
-        df = df.sort_values("skd_ke")
+    if not img_table or not img_charts:
+        return None
 
-    num_data = len(df)
-    dynamic_width = max(10, num_data * 0.8)
+    # Gabung secara vertikal
+    w = max(img_table.width, img_charts.width)
+    h = img_table.height + img_charts.height + 50 # margin antar halaman
 
-    fig, (ax_comp, ax_total) = plt.subplots(2, 1, figsize=(dynamic_width, 10), dpi=100)
-
-    color_twk = "#25343F"
-    color_tiu = "#78909C"
-    color_tkp = "#FB8C00"
-
-    # Grafik Komponen
-    ax_comp.plot(df["label"], df["twk"], marker="o", label="TWK", color=color_twk, linewidth=3)
-    ax_comp.plot(df["label"], df["tiu"], marker="o", label="TIU", color=color_tiu, linewidth=3)
-    ax_comp.plot(df["label"], df["tkp"], marker="o", label="TKP", color=color_tkp, linewidth=3)
-    ax_comp.set_ylabel("Nilai", color=color_twk, fontweight='bold')
-    ax_comp.set_title("Grafik Komponen Nilai SKD", fontsize=12, fontweight='bold', pad=10, color=color_twk)
-    ax_comp.legend(loc='upper left', bbox_to_anchor=(1, 1))
-    ax_comp.grid(True, linestyle='--', alpha=0.6)
-    ax_comp.tick_params(axis='x', rotation=45, colors=color_twk)
-    ax_comp.tick_params(axis='y', colors=color_twk)
-
-    # Grafik Total
-    ax_total.plot(df["label"], df["total"], marker="o", color=color_twk, linewidth=3.5, label="Total")
-    ax_total.set_ylabel("Total Nilai", color=color_twk, fontweight='bold')
-    ax_total.set_title("Grafik Total Nilai SKD", fontsize=12, fontweight='bold', pad=10, color=color_twk)
-    ax_total.legend(loc='upper left', bbox_to_anchor=(1, 1))
-    ax_total.grid(True, linestyle='--', alpha=0.6)
-    ax_total.tick_params(axis='x', rotation=45, colors=color_twk)
-    ax_total.tick_params(axis='y', colors=color_twk)
-
-    fig.suptitle(title + " (Grafik)", fontsize=14, fontweight='bold', y=0.98, color=color_twk)
-    plt.tight_layout(rect=[0, 0, 1, 0.96])
+    combined = Image.new("RGB", (w, h), "white")
+    combined.paste(img_table, (0, 0))
+    combined.paste(img_charts, (0, img_table.height + 50))
 
     buf = io.BytesIO()
-    fig.savefig(buf, format="png", bbox_inches="tight")
-    plt.close(fig)
+    combined.save(buf, format="PNG")
     return buf.getvalue()
-
-@st.cache_data(show_spinner=False)
-def get_report_zip(df, title, filename_base):
-    """Kembalikan ZIP bytes berisi PNG tabel dan PNG grafik."""
-    table_png = render_table_to_bytes(df, title)
-    charts_png = render_charts_to_bytes(df, title)
-
-    zip_buf = io.BytesIO()
-    with zipfile.ZipFile(zip_buf, "w", zipfile.ZIP_DEFLATED) as zf:
-        if table_png:
-            zf.writestr(f"{filename_base}_tabel.png", table_png)
-        if charts_png:
-            zf.writestr(f"{filename_base}_grafik.png", charts_png)
-
-    return zip_buf.getvalue()
 
 
 # Cek apakah ada notifikasi tertunda di session state (setelah fungsi didefinisikan)
@@ -861,16 +863,16 @@ def admin_grafik_nilai():
         cols_to_show = ["nama", "skd_ke", "twk", "tiu", "tkp", "total"]
         st.dataframe(filtered[cols_to_show], use_container_width=True, hide_index=True)
 
-        # Tombol Download Laporan ZIP - Mengandung 2 gambar (Tabel & Grafik) secara terpisah
+        # Tombol Download Laporan PNG - Berisi Tabel & Grafik (Halaman 1 & 2)
         report_title = f"Laporan SKD: {pilih_user} ({pilih_skd})"
         filename_base = f"laporan_skd_{pilih_user}_{pilih_skd}".replace(" ", "_")
-        zip_bytes = get_report_zip(filtered, report_title, filename_base)
-        if zip_bytes:
+        report_png = get_consolidated_report(filtered, report_title)
+        if report_png:
             st.download_button(
-                label="📥 Download Laporan ZIP (Tabel & Grafik Terpisah)",
-                data=zip_bytes,
-                file_name=f"{filename_base}.zip",
-                mime="application/zip",
+                label="📥 Download Laporan PNG (Halaman 1 & 2)",
+                data=report_png,
+                file_name=f"{filename_base}.png",
+                mime="image/png",
                 use_container_width=True
             )
 
@@ -940,16 +942,16 @@ def user_personal_dashboard(user: dict):
         cols = [c for c in ["skd_ke", "twk", "tiu", "tkp", "total"] if c in df.columns]
         st.dataframe(df[cols], use_container_width=True, hide_index=True)
 
-        # Tombol Download Laporan ZIP - Mengandung 2 gambar (Tabel & Grafik) secara terpisah
+        # Tombol Download Laporan PNG - Berisi Tabel & Grafik (Halaman 1 & 2)
         report_title = f"Laporan Hasil SKD: {user.get('nama')}"
         filename_base = f"laporan_skd_{user.get('nama')}".replace(" ", "_")
-        zip_bytes = get_report_zip(df, report_title, filename_base)
-        if zip_bytes:
+        report_png = get_consolidated_report(df, report_title)
+        if report_png:
             st.download_button(
-                label="📥 Download Laporan ZIP (Tabel & Grafik Terpisah)",
-                data=zip_bytes,
-                file_name=f"{filename_base}.zip",
-                mime="application/zip",
+                label="📥 Download Laporan PNG (Halaman 1 & 2)",
+                data=report_png,
+                file_name=f"{filename_base}.png",
+                mime="image/png",
                 use_container_width=True
             )
 
