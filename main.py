@@ -805,9 +805,9 @@ def admin_grafik_nilai():
     show_range = (max_skd > 15) or (pilih_skd == "Rentang")
 
     if show_range:
-        st.markdown("### 🔍 Pilih Rentang Data")
+        st.markdown("### 🔍 Tentukan rentang data")
         if max_skd > 15:
-            st.info(f"Ditemukan {max_skd} data. Tampilan layar boleh semua, namun Cetak/Laporan dibatasi maksimal 15 data.")
+            st.info(f"Jumlah data: {max_skd}. Semua data dapat dilihat di layar, namun saat mencetak atau membuat laporan, hanya 15 data yang akan ditampilkan per halaman.")
 
         col_r1, col_r2 = st.columns(2)
         with col_r1:
@@ -970,8 +970,8 @@ def user_personal_dashboard(user: dict):
     # Range selector for Reports
     r_dari, r_sampai = 1, total_skd
     if total_skd > 15:
-        st.markdown("### 🔍 Pilih Rentang Laporan")
-        st.info(f"Ditemukan {total_skd} data. Tampilan layar menampilkan semua, namun Cetak/Laporan dibatasi maksimal 15 data.")
+        st.markdown("### 🔍 Tentukan rentang data")
+        st.info(f"Jumlah data: {total_skd}. Semua data dapat dilihat di layar, namun saat mencetak atau membuat laporan, hanya 15 data yang akan ditampilkan per halaman.")
         col_r1, col_r2 = st.columns(2)
         with col_r1:
             default_dari = max(1, total_skd - 14)
