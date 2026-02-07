@@ -77,7 +77,7 @@ def login():
 
     with tab2:
         st.subheader("Daftar Akun Baru")
-        new_username = st.text_input("Nama Lengkap", key="reg_user")
+        new_username = st.text_input("Username", key="reg_user")
         new_password = st.text_input("Password", type="password", key="reg_pass")
         confirm_password = st.text_input("Konfirmasi Password", type="password", key="reg_conf")
 
