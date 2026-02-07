@@ -73,7 +73,7 @@ def login():
 
             st.session_state.user = user
             st.session_state.role = user.get("role", "user")
-            st.success("Login berhasil")
+            st.session_state.toast_msg = "Login berhasil"
             st.rerun()
 
     with tab2:
@@ -102,7 +102,8 @@ def login():
                             "password": password_hash,
                             "role": "user", # Selalu 'user' untuk registrasi mandiri
                         }).execute()
-                        st.success("Pendaftaran berhasil! Silakan login di tab sebelah.")
+                        st.session_state.toast_msg = "Pendaftaran berhasil! Silakan login."
+                        st.rerun()
                     except Exception as e:
                         st.error(f"Terjadi kesalahan: {e}")
 
