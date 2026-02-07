@@ -297,16 +297,21 @@ def render_skd_chart(df, title, is_component=True):
     
     fig, ax = plt.subplots(figsize=(dynamic_width, 5), dpi=100)
     
+    # Warna yang lebih "tebal" (bold) agar tidak samar
+    color_twk = "#25343F"  # Navy
+    color_tiu = "#78909C"  # Darker Blue-Gray
+    color_tkp = "#FB8C00"  # Darker Orange
+    
     if is_component:
-        ax.plot(df["label"], df["twk"], marker="o", label="TWK", color="#25343F", linewidth=2)
-        ax.plot(df["label"], df["tiu"], marker="o", label="TIU", color="#BFC9D1", linewidth=2)
-        ax.plot(df["label"], df["tkp"], marker="o", label="TKP", color="#FF9B51", linewidth=2)
-        ax.set_ylabel("Nilai")
+        ax.plot(df["label"], df["twk"], marker="o", label="TWK", color=color_twk, linewidth=3)
+        ax.plot(df["label"], df["tiu"], marker="o", label="TIU", color=color_tiu, linewidth=3)
+        ax.plot(df["label"], df["tkp"], marker="o", label="TKP", color=color_tkp, linewidth=3)
+        ax.set_ylabel("Nilai", color=color_twk, fontweight='bold')
     else:
-        ax.plot(df["label"], df["total"], marker="o", color='#25343F', linewidth=2.5, label="Total")
-        ax.set_ylabel("Total Nilai")
+        ax.plot(df["label"], df["total"], marker="o", color=color_twk, linewidth=3.5, label="Total")
+        ax.set_ylabel("Total Nilai", color=color_twk, fontweight='bold')
 
-    ax.set_title(title, fontsize=14, fontweight='bold', pad=15)
+    ax.set_title(title, fontsize=14, fontweight='bold', pad=15, color=color_twk)
     ax.legend(loc='upper left', bbox_to_anchor=(1, 1))
     ax.grid(True, linestyle='--', alpha=0.6)
     
@@ -376,25 +381,32 @@ def render_full_report_as_bytes(df, title):
             elif row > 0:
                 cell.set_facecolor('#F8F9F9')
 
+        # Warna yang lebih "tebal" (bold) agar tidak samar
+        color_twk = "#25343F"
+        color_tiu = "#78909C"
+        color_tkp = "#FB8C00"
+
         # 2. GRAFIK KOMPONEN
-        ax_comp.plot(df["label"], df["twk"], marker="o", label="TWK", color="#25343F", linewidth=2)
-        ax_comp.plot(df["label"], df["tiu"], marker="o", label="TIU", color="#BFC9D1", linewidth=2)
-        ax_comp.plot(df["label"], df["tkp"], marker="o", label="TKP", color="#FF9B51", linewidth=2)
-        ax_comp.set_ylabel("Nilai")
-        ax_comp.set_title("Grafik Komponen Nilai SKD", fontsize=12, fontweight='bold', pad=10)
+        ax_comp.plot(df["label"], df["twk"], marker="o", label="TWK", color=color_twk, linewidth=3)
+        ax_comp.plot(df["label"], df["tiu"], marker="o", label="TIU", color=color_tiu, linewidth=3)
+        ax_comp.plot(df["label"], df["tkp"], marker="o", label="TKP", color=color_tkp, linewidth=3)
+        ax_comp.set_ylabel("Nilai", color=color_twk, fontweight='bold')
+        ax_comp.set_title("Grafik Komponen Nilai SKD", fontsize=12, fontweight='bold', pad=10, color=color_twk)
         ax_comp.legend(loc='upper left', bbox_to_anchor=(1, 1))
         ax_comp.grid(True, linestyle='--', alpha=0.6)
-        ax_comp.tick_params(axis='x', rotation=45)
+        ax_comp.tick_params(axis='x', rotation=45, colors=color_twk)
+        ax_comp.tick_params(axis='y', colors=color_twk)
 
         # 3. GRAFIK TOTAL
-        ax_total.plot(df["label"], df["total"], marker="o", color='#25343F', linewidth=2.5, label="Total")
-        ax_total.set_ylabel("Total Nilai")
-        ax_total.set_title("Grafik Total Nilai SKD", fontsize=12, fontweight='bold', pad=10)
+        ax_total.plot(df["label"], df["total"], marker="o", color=color_twk, linewidth=3.5, label="Total")
+        ax_total.set_ylabel("Total Nilai", color=color_twk, fontweight='bold')
+        ax_total.set_title("Grafik Total Nilai SKD", fontsize=12, fontweight='bold', pad=10, color=color_twk)
         ax_total.legend(loc='upper left', bbox_to_anchor=(1, 1))
         ax_total.grid(True, linestyle='--', alpha=0.6)
-        ax_total.tick_params(axis='x', rotation=45)
+        ax_total.tick_params(axis='x', rotation=45, colors=color_twk)
+        ax_total.tick_params(axis='y', colors=color_twk)
         
-        fig.suptitle(title, fontsize=16, fontweight='bold', y=0.98)
+        fig.suptitle(title, fontsize=16, fontweight='bold', y=0.98, color=color_twk)
         plt.tight_layout(rect=[0, 0, 1, 0.97])
         
         buf = io.BytesIO()
