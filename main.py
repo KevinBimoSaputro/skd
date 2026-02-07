@@ -331,9 +331,9 @@ def render_full_report_as_bytes(df, title):
     num_data = len(df)
     
     # Estimasi tinggi dinamis
-    table_height = max(2, (num_data + 1) * 0.4)
+    table_height = max(2, (num_data + 1) * 0.35)
     chart_height = 5
-    total_height = table_height + (chart_height * 2) + 1.5
+    total_height = table_height + (chart_height * 2) + 1.2
     
     # Lebar dinamis
     dynamic_width = max(10, num_data * 0.8)
@@ -361,7 +361,7 @@ def render_full_report_as_bytes(df, title):
             cellText=table_data.values,
             colLabels=table_data.columns,
             cellLoc='center',
-            loc='center'
+            loc='upper center'
         )
         the_table.auto_set_font_size(False)
         the_table.set_fontsize(10)
@@ -400,8 +400,8 @@ def render_full_report_as_bytes(df, title):
         ax_total.tick_params(axis='x', rotation=45, colors=color_twk)
         ax_total.tick_params(axis='y', colors=color_twk)
         
-        fig.suptitle(title, fontsize=16, fontweight='bold', y=0.98, color=color_twk)
-        plt.tight_layout(rect=[0, 0, 1, 0.97])
+        fig.suptitle(title, fontsize=16, fontweight='bold', y=0.97, color=color_twk)
+        plt.tight_layout(rect=[0, 0, 1, 0.96])
         
         buf = io.BytesIO()
         fig.savefig(buf, format="png", bbox_inches="tight")
@@ -850,23 +850,17 @@ def admin_grafik_nilai():
         cols_to_show = ["nama", "skd_ke", "twk", "tiu", "tkp", "total"]
         st.dataframe(filtered[cols_to_show], use_container_width=True, hide_index=True)
 
-        col_c1, col_c2 = st.columns(2)
-        with col_c1:
-            if st.button("🖨️ Cetak Halaman", use_container_width=True):
-                st.components.v1.html("<script>window.parent.print();</script>", height=0)
-        
-        with col_c2:
-            # Tombol Download Laporan Gabungan (PNG)
-            report_title = f"Laporan SKD: {pilih_user} ({pilih_skd})"
-            report_bytes = render_full_report_as_bytes(filtered, report_title)
-            if report_bytes:
-                st.download_button(
-                    label="📥 Download Laporan (PNG)",
-                    data=report_bytes,
-                    file_name=f"laporan_skd_{pilih_user}_{pilih_skd}.png",
-                    mime="image/png",
-                    use_container_width=True
-                )
+        # Tombol Download Laporan Gabungan (PNG) - Menggantikan tombol cetak agar data tidak terpisah
+        report_title = f"Laporan SKD: {pilih_user} ({pilih_skd})"
+        report_bytes = render_full_report_as_bytes(filtered, report_title)
+        if report_bytes:
+            st.download_button(
+                label="📥 Download Laporan PNG (Tabel & Grafik)",
+                data=report_bytes,
+                file_name=f"laporan_skd_{pilih_user}_{pilih_skd}.png",
+                mime="image/png",
+                use_container_width=True
+            )
 
     with st.container(border=True):
         st.subheader("Grafik Komponen Nilai")
@@ -934,23 +928,17 @@ def user_personal_dashboard(user: dict):
         cols = [c for c in ["skd_ke", "twk", "tiu", "tkp", "total"] if c in df.columns]
         st.dataframe(df[cols], use_container_width=True, hide_index=True)
         
-        col_c1, col_c2 = st.columns(2)
-        with col_c1:
-            if st.button("🖨️ Cetak Halaman", use_container_width=True):
-                st.components.v1.html("<script>window.parent.print();</script>", height=0)
-        
-        with col_c2:
-            # Tombol Download Laporan Gabungan (PNG)
-            report_title = f"Laporan Hasil SKD: {user.get('nama')}"
-            report_bytes = render_full_report_as_bytes(df, report_title)
-            if report_bytes:
-                st.download_button(
-                    label="📥 Download Laporan (PNG)",
-                    data=report_bytes,
-                    file_name=f"laporan_skd_{user.get('nama')}.png",
-                    mime="image/png",
-                    use_container_width=True
-                )
+        # Tombol Download Laporan Gabungan (PNG) - Menggantikan tombol cetak agar data tidak terpisah
+        report_title = f"Laporan Hasil SKD: {user.get('nama')}"
+        report_bytes = render_full_report_as_bytes(df, report_title)
+        if report_bytes:
+            st.download_button(
+                label="📥 Download Laporan PNG (Tabel & Grafik)",
+                data=report_bytes,
+                file_name=f"laporan_skd_{user.get('nama')}.png",
+                mime="image/png",
+                use_container_width=True
+            )
 
     with st.container(border=True):
         st.subheader("Grafik Komponen Nilai (Per Percobaan)")
