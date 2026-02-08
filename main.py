@@ -67,7 +67,7 @@ def inject_global_css():
         }
         /* Highlight menu aktif */
         [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label[data-baseweb="radio"] div:first-child {
-            border-color: #1E293B !important;
+            border-color: #3B82F6 !important;
         }
 
         /* 3. Header / Top Navigation */
@@ -105,7 +105,7 @@ def inject_global_css():
             color: #0F172A !important;
         }
 
-        /* 6. Buttons Styling - Professional Gradients */
+        /* 6. Buttons Styling - Professional Refined Colors */
         div.stButton > button, 
         div.stDownloadButton > button,
         div[data-testid="stFormSubmitButton"] > button {
@@ -119,55 +119,37 @@ def inject_global_css():
             padding: 10px 24px !important;
         }
 
-        /* Primary Buttons - Blue Gradient (Aksi Utama) */
-        [data-testid^="stBaseButton-primary"] {
-            background: linear-gradient(135deg, #3B82F6, #6366F1) !important;
+        /* Primary & All Normal Buttons - Unified Blue */
+        [data-testid^="stBaseButton-primary"],
+        [data-testid^="stBaseButton-secondary"],
+        div.stButton > button,
+        div.stDownloadButton > button {
+            background-color: #3B82F6 !important;
             color: #FFFFFF !important;
             border: none !important;
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2) !important;
         }
-        [data-testid^="stBaseButton-primary"]:hover {
-            background: #2563EB !important;
+        [data-testid^="stBaseButton-primary"]:hover,
+        [data-testid^="stBaseButton-secondary"]:hover,
+        div.stButton > button:hover {
+            background-color: #2563EB !important;
             transform: translateY(-1px) !important;
             box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3) !important;
         }
 
-        /* Secondary Buttons - Light Gray */
-        [data-testid^="stBaseButton-secondary"] {
-            background-color: #F8FAFC !important;
-            color: #334155 !important;
-            border: 1px solid #E2E8F0 !important;
-        }
-        [data-testid^="stBaseButton-secondary"]:hover {
-            background-color: #F1F5F9 !important;
-            color: #0F172A !important;
-        }
-
-        /* Context-aware: Success/Green for "Iya" (Aksi Positif) */
-        [data-testid="stDialog"] [data-testid^="stBaseButton-primary"],
-        [data-testid="stSidebar"] [data-testid^="stBaseButton-primary"] {
-            background: #22C55E !important;
-            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2) !important;
-        }
-        [data-testid="stDialog"] [data-testid^="stBaseButton-primary"]:hover,
-        [data-testid="stSidebar"] [data-testid^="stBaseButton-primary"]:hover {
-            background: #16A34A !important;
-        }
-
-        /* Context-aware: Error/Red for "Tidak" or Logout (Aksi Berbahaya) */
-        [data-testid="stDialog"] [data-testid^="stBaseButton-secondary"],
-        [data-testid="stSidebar"] [data-testid^="stBaseButton-secondary"] {
+        /* Logout & "Tidak" (Danger Actions) - Targeted Red Overrides */
+        /* Targets secondary buttons in sidebar and dialogs specifically */
+        [data-testid="stSidebar"] [data-testid^="stBaseButton-secondary"],
+        [data-testid="stDialog"] [data-testid^="stBaseButton-secondary"] {
             background-color: #EF4444 !important;
-            color: #FFFFFF !important;
-            border: none !important;
             box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2) !important;
         }
-        [data-testid="stDialog"] [data-testid^="stBaseButton-secondary"]:hover,
-        [data-testid="stSidebar"] [data-testid^="stBaseButton-secondary"]:hover {
+        [data-testid="stSidebar"] [data-testid^="stBaseButton-secondary"]:hover,
+        [data-testid="stDialog"] [data-testid^="stBaseButton-secondary"]:hover {
             background-color: #DC2626 !important;
         }
 
-        /* 7. Success Toast - Redesigned Palette */
+        /* 7. Notifications & Alerts Refinement */
         @keyframes toastTimeline {
             0% { transform: translateX(-120%); opacity: 0; }
             10% { transform: translateX(0); opacity: 1; }
@@ -175,24 +157,49 @@ def inject_global_css():
             100% { transform: translateX(120%); opacity: 0; }
         }
 
+        /* Custom Toast - Unified Blue */
         .custom-toast {
             position: fixed;
             top: 20px;
             left: 20px;
-            background-color: #064E3B !important;
-            color: #E2E8F0 !important;
+            background-color: #DBEAFE !important;
+            color: #1E3A8A !important;
             padding: 16px 24px !important;
             border-radius: 12px !important;
-            border: 1px solid #22C55E !important;
-            border-left: 6px solid #22C55E !important;
+            border: 1px solid #3B82F6 !important;
+            border-left: 6px solid #3B82F6 !important;
             z-index: 999999;
             display: flex;
             align-items: center;
             gap: 12px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2) !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
             animation: toastTimeline 4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
             font-weight: 600 !important;
             white-space: nowrap;
+        }
+
+        /* Streamlit Alerts - Unified Blue */
+        div[data-testid="stNotificationContentSuccess"],
+        div[data-testid="stNotificationContentInfo"] {
+            background-color: #DBEAFE !important;
+            color: #1E3A8A !important;
+            border: 1px solid #3B82F6 !important;
+        }
+        div[data-testid="stNotificationContentSuccess"] svg,
+        div[data-testid="stNotificationContentInfo"] svg {
+            fill: #3B82F6 !important;
+        }
+
+        /* Streamlit Warnings (Danger Actions Context) - Danger Red */
+        div[data-testid="stNotificationContentWarning"],
+        div[data-testid="stNotificationContentError"] {
+            background-color: #FEE2E2 !important;
+            color: #991B1B !important;
+            border: 1px solid #EF4444 !important;
+        }
+        div[data-testid="stNotificationContentWarning"] svg,
+        div[data-testid="stNotificationContentError"] svg {
+            fill: #EF4444 !important;
         }
 
         /* 8. Table & DataFrame Styling */
