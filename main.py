@@ -429,7 +429,7 @@ if "toast_msg" in st.session_state:
 
 
 def admin_user_management():
-    st.header("👤 User Management (Admin)")
+    st.header("👤 Kelola Pengguna")
 
     tab1, tab2 = st.tabs(["👥 Kelola Akun", "📊 Kelola Nilai"])
 
@@ -805,7 +805,7 @@ def prepare_admin_data():
 
 
 def admin_dashboard_summary():
-    st.header("📈 Dashboard Summary")
+    st.header("📈 Beranda")
     data = prepare_admin_data()
     if not data:
         st.info("Belum ada data user.")
@@ -853,7 +853,7 @@ def admin_dashboard_summary():
 
 
 def admin_grafik_nilai():
-    st.header("📊 Grafik Nilai SKD")
+    st.header("📊 Visualisasi Data")
     data = prepare_admin_data()
     if not data:
         st.info("Belum ada data user.")
@@ -964,7 +964,7 @@ def admin_grafik_nilai():
 
 def render_laporan_page(user, role):
     """Halaman Laporan dan Cetak khusus untuk download file laporan A4."""
-    st.header("🖨️ Laporan & Cetak")
+    st.header("🖨️ Cetak Laporan")
     
     if role == "admin":
         data = prepare_admin_data()
@@ -1128,7 +1128,7 @@ def _render_individual_report_ui(df_target, pilih_user):
 
 def user_personal_dashboard(user: dict):
     """Dashboard khusus user: hanya lihat nilai miliknya sendiri."""
-    st.header("📊 Dashboard Nilai Saya")
+    st.header("📊 Beranda Saya")
 
     scores = fetch_user_scores(user["id"])
     
@@ -1175,7 +1175,7 @@ def user_personal_dashboard(user: dict):
 
 
 def admin_maintenance():
-    st.header("🛠️ Maintenance / Reset Data")
+    st.header("🛠️ Reset Data")
     st.warning(
         "**PERINGATAN:** Menu ini akan menghapus data secara permanen. "
         "Pastikan Anda benar-benar ingin melakukannya."
@@ -1236,9 +1236,9 @@ role = user.get("role", "user") if user else "user"
 
 # Menu items based on role
 if role == "admin":
-    items = ["Dashboard", "Grafik Nilai", "User Management", "Laporan", "Maintenance"]
+    items = ["Beranda", "Visualisasi Data", "Kelola Pengguna", "Cetak Laporan", "Reset Data"]
 else:
-    items = ["Dashboard", "Profil & Nilai Saya", "Laporan"]
+    items = ["Beranda Saya", "Profil & Nilai Saya", "Cetak Laporan"]
 
 with st.sidebar:
     menu = st.radio(
@@ -1251,27 +1251,27 @@ with st.sidebar:
     logout()
 
 # ======================
-# HALAMAN DASHBOARD
+# HALAMAN BERANDA
 # ======================
-if menu == "Dashboard":
+if menu in ["Beranda", "Beranda Saya"]:
     if role == "admin":
         admin_dashboard_summary()
     else:
         user_personal_dashboard(user)
 
 # ======================
-# HALAMAN GRAFIK NILAI
+# HALAMAN VISUALISASI DATA
 # ======================
-elif menu == "Grafik Nilai":
+elif menu == "Visualisasi Data":
     if role == "admin":
         admin_grafik_nilai()
     else:
         st.error("Hanya Admin yang dapat mengakses halaman ini.")
 
 # ======================
-# HALAMAN USER MANAGEMENT / PROFIL & NILAI
+# HALAMAN KELOLA PENGGUNA / PROFIL & NILAI
 # ======================
-elif menu in ["User Management", "Profil & Nilai Saya"]:
+elif menu in ["Kelola Pengguna", "Profil & Nilai Saya"]:
     if role == "admin":
         admin_user_management()
     else:
@@ -1281,15 +1281,15 @@ elif menu in ["User Management", "Profil & Nilai Saya"]:
             user_self_page(user)
 
 # ======================
-# HALAMAN LAPORAN
+# HALAMAN CETAK LAPORAN
 # ======================
-elif menu == "Laporan":
+elif menu == "Cetak Laporan":
     render_laporan_page(user, role)
 
 # ======================
-# HALAMAN MAINTENANCE
+# HALAMAN RESET DATA
 # ======================
-elif menu == "Maintenance":
+elif menu == "Reset Data":
     if role == "admin":
         admin_maintenance()
     else:
