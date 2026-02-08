@@ -31,72 +31,87 @@ def show_toast(message: str):
 
 
 def inject_global_css():
-    """Menerapkan Design System baru: Minimalis, Profesional, dan Modern dengan Dark-Light Contrast."""
+    """Menerapkan Design System baru: Modern, Dark-Light Contrast, dan Gradient."""
     st.markdown(
         """
         <style>
         /* 1. Global Background & Text */
         .stApp {
-            background-color: #F8FAFC !important;
-            color: #1E293B !important;
+            background: linear-gradient(180deg, #0F172A 0%, #1E293B 100%) !important;
+            color: #334155 !important;
         }
         
-        /* 2. Sidebar Styling - Dark Theme */
+        /* Main Content Area - Bright */
+        section[data-testid="stMain"] {
+            background-color: #F8FAFC !important;
+        }
+
+        /* 2. Sidebar Styling - Full Dark */
         [data-testid="stSidebar"] {
-            background-color: #1E293B !important;
-            color: #F8FAFC !important;
+            background-color: #020617 !important;
+            color: #E2E8F0 !important;
             border-right: none !important;
         }
         [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
         [data-testid="stSidebar"] .stRadio label p,
         [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 {
-            color: #F8FAFC !important;
+            color: #E2E8F0 !important;
         }
         [data-testid="stSidebarNav"] span {
-            color: #F8FAFC !important;
+            color: #E2E8F0 !important;
         }
         /* Sidebar item hover */
         [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label:hover {
-            background-color: rgba(255, 255, 255, 0.05) !important;
+            background-color: #0F172A !important;
             border-radius: 8px !important;
+        }
+        /* Highlight menu aktif */
+        [data-testid="stSidebar"] .stRadio div[role="radiogroup"] label[data-baseweb="radio"] div:first-child {
+            border-color: #3B82F6 !important;
         }
 
         /* 3. Header / Top Navigation */
         header[data-testid="stHeader"] {
-            background-color: rgba(248, 250, 252, 0.8) !important;
+            background-color: rgba(2, 6, 23, 0.5) !important;
             backdrop-filter: blur(10px) !important;
-            border-bottom: 1px solid #E2E8F0 !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
         }
         header[data-testid="stHeader"] svg {
-            fill: #1E293B !important;
+            fill: #E2E8F0 !important;
         }
 
-        /* 4. Cards Styling - Soft Shadows */
+        /* 4. Cards Styling - Bright Content with Soft Shadows */
         .main-card, [data-testid="stVerticalBlockBorderWrapper"] {
             background-color: #FFFFFF !important;
             border: none !important;
             border-radius: 12px !important;
             padding: 24px !important;
             margin-bottom: 24px !important;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08) !important;
         }
 
         /* 5. Typography */
-        h1, h2, h3, h4, h5, h6, label, p, span, .stMarkdown {
-            color: #1E293B !important;
+        h1, h2, h3, h4, h5, h6 {
+            color: #0F172A !important;
+        }
+        p, span, .stMarkdown {
+            color: #334155 !important;
+        }
+        small, .stCaption {
+            color: #64748B !important;
         }
         [data-testid="stWidgetLabel"] p {
             font-weight: 600 !important;
-            color: #334155 !important;
+            color: #0F172A !important;
         }
 
-        /* 6. Buttons Styling - Modern Gradients & Soft Red */
+        /* 6. Buttons Styling - Modern Gradients */
         div.stButton > button, 
         div.stDownloadButton > button,
         div[data-testid="stFormSubmitButton"] > button {
             border-radius: 8px !important;
             font-weight: 600 !important;
-            transition: all 0.3s ease !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
             min-height: 45px !important;
             display: flex !important;
             align-items: center !important;
@@ -104,64 +119,87 @@ def inject_global_css():
             padding: 10px 24px !important;
         }
 
-        /* Primary Buttons - Gradient */
+        /* Primary Buttons - Blue Gradient */
         [data-testid^="stBaseButton-primary"] {
-            background: linear-gradient(135deg, #25343F 0%, #4A6171 100%) !important;
+            background: linear-gradient(135deg, #3B82F6, #6366F1) !important;
             color: white !important;
             border: none !important;
-            box-shadow: 0 4px 15px rgba(37, 52, 63, 0.2) !important;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important;
         }
         [data-testid^="stBaseButton-primary"]:hover {
-            transform: translateY(-1px) !important;
-            box-shadow: 0 6px 20px rgba(37, 52, 63, 0.3) !important;
-            background: linear-gradient(135deg, #4A6171 0%, #25343F 100%) !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4) !important;
+            filter: brightness(1.1) !important;
         }
 
-        /* Secondary Buttons - Soft Red (Danger/Cancel) */
+        /* Secondary Buttons - Soft Gray */
         [data-testid^="stBaseButton-secondary"] {
-            background-color: #FFF1F2 !important;
-            color: #E11D48 !important;
-            border: 1px solid #FECDD3 !important;
+            background-color: #F8FAFC !important;
+            color: #475569 !important;
+            border: 1px solid #E2E8F0 !important;
         }
         [data-testid^="stBaseButton-secondary"]:hover {
-            background-color: #FFE4E6 !important;
-            border-color: #FB7185 !important;
+            background-color: #F1F5F9 !important;
+            color: #1E293B !important;
         }
 
         /* Context-aware: Green for "Iya" in Dialogs or Sidebar */
         [data-testid="stDialog"] [data-testid^="stBaseButton-primary"],
         [data-testid="stSidebar"] [data-testid^="stBaseButton-primary"] {
-            background: #10B981 !important;
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2) !important;
+            background: #22C55E !important;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3) !important;
         }
         [data-testid="stDialog"] [data-testid^="stBaseButton-primary"]:hover,
         [data-testid="stSidebar"] [data-testid^="stBaseButton-primary"]:hover {
-            background: #059669 !important;
+            background: #16A34A !important;
         }
 
+        /* Context-aware: Red for "Tidak" or Logout in Sidebar/Dialogs */
+        [data-testid="stDialog"] [data-testid^="stBaseButton-secondary"],
+        [data-testid="stSidebar"] [data-testid^="stBaseButton-secondary"] {
+            background-color: #FEE2E2 !important;
+            color: #991B1B !important;
+            border: 1px solid #EF4444 !important;
+        }
+        [data-testid="stDialog"] [data-testid^="stBaseButton-secondary"]:hover,
+        [data-testid="stSidebar"] [data-testid^="stBaseButton-secondary"]:hover {
+            background-color: #FECACA !important;
+        }
 
         /* 7. Success Toast - Custom Animation & Position */
-        @keyframes toastAnimation {
+        @keyframes slideInLeft {
+            from { transform: translateX(-120%); opacity: 0; }
+            to   { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to   { transform: translateX(120%); opacity: 0; }
+        }
+
+        @keyframes toastTimeline {
             0% { transform: translateX(-120%); opacity: 0; }
             10% { transform: translateX(0); opacity: 1; }
             90% { transform: translateX(0); opacity: 1; }
             100% { transform: translateX(120%); opacity: 0; }
         }
+
         .custom-toast {
             position: fixed;
-            top: 50px;
+            top: 20px;
             left: 20px;
-            background-color: #ECFDF5 !important;
-            color: #065F46 !important;
+            background-color: #DCFCE7 !important;
+            color: #166534 !important;
             padding: 16px 24px !important;
             border-radius: 12px !important;
-            border-left: 6px solid #10B981 !important;
+            border: 1px solid #22C55E !important;
+            border-left: 6px solid #22C55E !important;
             z-index: 999999;
             display: flex;
             align-items: center;
             gap: 12px;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
-            animation: toastAnimation 4s ease-in-out forwards;
+            animation: toastTimeline 4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
             font-weight: 600 !important;
             white-space: nowrap;
         }
