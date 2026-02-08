@@ -910,11 +910,22 @@ def admin_grafik_nilai():
         filtered = filtered.sort_values(["skd_ke", "nama"])
         st.subheader(f"Data SKD Rentang ke-{r_dari} sampai {r_sampai}")
     elif pilih_skd == "Terakhir":
-        if "created_at" in df.columns:
-            filtered = df.sort_values("created_at").groupby("user_id").tail(1).copy()
+        show_this_week_grafik = st.radio("Filter Waktu:", ["Semua", "Minggu Ini"], horizontal=True, key="admin_time_filter_grafik")
+
+        target_df = df.copy()
+        time_suffix = ""
+        if show_this_week_grafik == "Minggu Ini" and "created_at" in target_df.columns:
+            target_df['created_at_dt'] = pd.to_datetime(target_df['created_at'])
+            today = datetime.date.today()
+            monday = today - datetime.timedelta(days=today.weekday())
+            target_df = target_df[target_df['created_at_dt'].dt.date >= monday]
+            time_suffix = " (Minggu Ini)"
+
+        if "created_at" in target_df.columns:
+            filtered = target_df.sort_values("created_at").groupby("user_id").tail(1).copy()
         else:
-            filtered = df.groupby("user_id").tail(1).copy()
-        st.subheader("Data SKD Terakhir Setiap User")
+            filtered = target_df.groupby("user_id").tail(1).copy()
+        st.subheader(f"Data SKD Terakhir Setiap User{time_suffix}")
     elif pilih_skd == "Semua":
         filtered = df.copy()
         filtered = filtered.sort_values(["skd_ke", "nama"])
