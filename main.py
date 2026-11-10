@@ -455,8 +455,10 @@ def admin_user_management():
     # Ambil semua user dan filter berdasarkan cohort di sidebar
     all_users = fetch_all_users()
     year_now = datetime.date.today().year
+    active_years = [int(u["tahun_aktif"]) for u in all_users if u.get("tahun_aktif") is not None] if all_users else []
+    default_year = max(active_years) if active_years else year_now
     filter_tahun = st.session_state.get("filter_tahun_aktif")
-    if filter_tahun is None: filter_tahun = year_now
+    if filter_tahun is None: filter_tahun = default_year
     
     if filter_tahun != "Semua":
         users = [u for u in all_users if u.get("tahun_aktif") == filter_tahun]
@@ -912,8 +914,13 @@ def prepare_admin_data():
     
     # Apply Global Filter Tahun Aktif
     year_now = datetime.date.today().year
+    if "tahun_aktif" in df_users.columns:
+        valid_years = df_users["tahun_aktif"].dropna().unique()
+        default_year = max([int(y) for y in valid_years]) if len(valid_years) > 0 else year_now
+    else:
+        default_year = year_now
     filter_tahun = st.session_state.get("filter_tahun_aktif")
-    if filter_tahun is None: filter_tahun = year_now
+    if filter_tahun is None: filter_tahun = default_year
     
     if filter_tahun != "Semua":
         if "tahun_aktif" in df_users.columns:
@@ -1451,18 +1458,20 @@ with st.sidebar:
         # Ambil semua user untuk mendapatkan daftar tahun_aktif yang unik
         users_for_filter = fetch_all_users()
         filter_options = ["Semua"]
+        unique_years = []
         
         if users_for_filter:
             df_u_filter = pd.DataFrame(users_for_filter)
             if "tahun_aktif" in df_u_filter.columns:
                 # Ambil tahun unik, hilangkan null, urutkan
-                unique_years = df_u_filter["tahun_aktif"].dropna().unique()
-                unique_years = sorted([int(y) for y in unique_years])
+                raw_years = df_u_filter["tahun_aktif"].dropna().unique()
+                unique_years = sorted([int(y) for y in raw_years])
                 filter_options.extend(unique_years)
         
         year_now = datetime.date.today().year
+        latest_year = max(unique_years) if unique_years else year_now
         try:
-            default_idx = filter_options.index(year_now)
+            default_idx = filter_options.index(latest_year)
         except (ValueError, IndexError):
             default_idx = 0
             
@@ -1482,7 +1491,10 @@ if menu in ["Beranda", "Beranda Saya"]:
     if role == "admin":
         admin_dashboard_summary()
     else:
-        user_personal_dashboard(user)
+        if user is None:
+            st.error("Data user tidak ditemukan di session.")
+        else:
+            user_personal_dashboard(user)
 
 # ======================
 # HALAMAN VISUALISASI DATA
